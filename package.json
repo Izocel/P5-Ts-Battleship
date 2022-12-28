@@ -12,7 +12,9 @@
     "p5": "0.9.0"
   },
   "devDependencies": {
-    "parcel-bundler": "^1.6.1"
+    "parcel-bundler": "^1.6.1",
+    "sass": "^1.57.1",
+    "typescript": "^4.9.4"
   },
   "keywords": [
     "p5js",
