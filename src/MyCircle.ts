@@ -15,8 +15,6 @@ export default class MyCircle {
 		const p5 = this._p5; // just for convenience
 
 		p5.push();
-		
-		
 
 		p5.translate(this._pos);
 		p5.noStroke();
