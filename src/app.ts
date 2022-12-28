@@ -1,10 +1,39 @@
-import P5, { Vector } from "p5";
+import P5, { Color, Vector } from "p5";
 import "p5/lib/addons/p5.dom";
 import "p5/lib/addons/p5.sound";
 import "./styles.scss";
 
-// // DEMO: A sample class implementation
-// import MyCircle from "./MyCircle";
+
+const shipNames = [
+	"Carrier",
+	"battle",
+	"Cruiser",
+	"Submarine",
+	"Destroyer"
+];
+
+const shipColors = {
+	Carrier: {
+		stroke: () => p5.stroke('black'),
+		fill: () => p5.fill('MediumSeaGreen')
+	},
+	battle: {
+		stroke: () => p5.stroke('black'),
+		fill: () => p5.fill('SlateBlue')
+	},
+	Cruiser: {
+		stroke: () => p5.stroke('black'),
+		fill: () => p5.fill('Orange')
+	},
+	Submarine: {
+		stroke: () => p5.stroke('black'),
+		fill: () => p5.fill('Gray')
+	},
+	Destroyer: {
+		stroke: () => p5.stroke('black'),
+		fill: () => p5.fill('Tomato')
+	}
+};
 
 function get_random(list: any): any {
 	return list[Math.floor((Math.random() * list.length))];
@@ -14,128 +43,160 @@ class MyVect extends P5.Vector {
 	public orientation?: string = "none";
 }
 
+
+/**
+ * TODO:Carrier (5), 
+ * TODO:Battleship (4),
+ * TODO:Cruiser (3),
+ * TODO:Submarine (3),
+ * TODO:Destroyer (2)  
+ */
+class Ship extends MyVect {
+	grid:MyVect[] = defenseGrid;
+	gridIndex:number;
+	maxHp:number = 2;
+	hp:number = this.maxHp;
+	name:string = "Destroyer";
+	colors = shipColors[this.name];
+
+	//draw colords rects
+	draw(ship:Ship) {
+		let p = this.grid[this.gridIndex];
+
+		if(!p) {
+			this.gridIndex = 0;
+			p = this.grid[this.gridIndex];
+		}
+
+		let quad = [];
+		if (this.orientation == "dDown") {
+			quad.push(p5.createVector(p.x - size / 2 + space, p.y));
+			quad.push(p5.createVector(p.x, p.y - size / 2 + space));
+			quad.push(p5.createVector(p.x + size - space, p.y + size / 2));
+			quad.push(p5.createVector(p.x + size / 2, p.y + size - space));
+		}
+		else if (this.orientation == "dUp") {
+			quad.push(p5.createVector(p.x - size + space, p.y + size / 2));
+			quad.push(p5.createVector(p.x, p.y - size / 2 + space));
+			quad.push(p5.createVector(p.x + size / 2 - space, p.y));
+			quad.push(p5.createVector(p.x - size / 2, p.y + size - space));
+		}
+		else if (this.orientation == "side") {
+			quad.push(p5.createVector(p.x - space, p.y - size/4 - space/2));
+			quad.push(p5.createVector(p.x + size + space, p.y - size/4 - space/2));
+
+			quad.push(p5.createVector(p.x + size + space, p.y + size/4 + space/2));
+			quad.push(p5.createVector(p.x - space, p.y + size/4 + space/2));
+		}
+		else if (this.orientation == "bottom") {
+			quad.push(p5.createVector(p.x + size/2 - space*2, p.y - size/4 + space));
+			quad.push(p5.createVector(p.x - size/2 + space*2, p.y - size/4 + space));
+
+			quad.push(p5.createVector(p.x - size/2 + space*2, p.y + size + space));
+			quad.push(p5.createVector(p.x + size/2 - space*2, p.y + size + space));
+		}
+		
+		this.colors.fill();
+		this.colors.stroke();
+		drawRoundedPolygon(quad, radius);
+	}
+}
+
+
 let points: MyVect[] = [];
 let totalPerRow;
 
-let canvaWidth = window.screen.width-50;
-let canvaHeight = window.screen.height-50;
+let canvaWidth = window.screen.width - 50;
+let canvaHeight = window.screen.height - 50;
 
 // Grid
-const size = 100;
+const rowNames: string[] = [
+	'a', 'b', 'c',
+	'd', 'e', 'f',
+	'g', 'h',
+	'i', 'j'
+]
+
+const rowsDef = [];
+const colsDef = [];
+
+const size = 80;
 const radius = 1;
 const space = 10;
-const middleSpacer = 200;
+const middleSpacer = 50;
 
 const nbCol = 10;
 const nbRow = 10;
-const width = size*nbCol;
-const height = size*nbRow;
+const width = size * nbCol;
+const height = size * nbRow;
 
 
 function windowResized() {
 	p5.resizeCanvas(canvaWidth, canvaHeight);
-  }
+}
 
 // Creating the sketch itself
 const sketch = (p5: P5) => {
-	// The sketch setup method 
 	p5.setup = () => {
 		const cnv = p5.createCanvas(canvaWidth, canvaHeight);
 		cnv.style('display', 'block');
 		cnv.parent('app');
-		
-		//Game Init
-		const newPoints:MyVect[] = setupIsoGrid(p5);
-		drawIsoGrid(p5, newPoints);
-
-		const scdStart = new Vector();
-		scdStart.y = size*nbRow + middleSpacer;
-		const newPoints2:MyVect[] = setupIsoGrid(p5, scdStart);
-		drawIsoGrid(p5, newPoints2);
 
 		// The game loop
 		p5.draw = () => {
+			gameLoop(p5);
 		};
 	}
 }
 
-function setupIsoGrid(p5: P5, start:Vector = new Vector()):MyVect[] {
+function setupIsoGrid(p5: P5, start: Vector = new Vector()): MyVect[] {
 	let points:MyVect[] = [];
 	for (let y = size / 2; y < height; y += size / 2) {
 		let x = ((y) % (size) == 0) ? size : size / 2;
 		let firstInRow = true;
 		for (; x < width; x += size) {
 			let p: MyVect = p5.createVector(x, y + start.y, 1);
-			p.orientation = get_random(["left", "right"]);
+			p.orientation = get_random(["dUp", "dDown"]);
 			if (firstInRow) {
-				//first point in a row cannot be left oriented
+				//first point in a row cannot be dUp oriented
 				firstInRow = false;
-				p.orientation = "right";
+				p.orientation = "dDown";
 			}
 			points.push(p);
 		}
-		//last point in a row cannot be right oriented
-		points[points.length - 1].orientation = "left";
+
+		//last point in a row cannot be dDown oriented
+		points[points.length - 1].orientation = "dUp";
 		if (!totalPerRow) totalPerRow = points.length;
 	}
 
 	return points;
 }
 
-function drawIsoGrid(p5: P5, points:MyVect[]) {
-
-
-	//draw grid
+function drawIsoGrid(p5: P5, points: MyVect[]) {
 	points.forEach((p, i) => {
-		p5.fill(255,255,255);
-		p5.stroke(0,0,0);
-		
+		p5.fill(255, 255, 255);
+		p5.stroke(0, 0, 0);
+
 		p5.beginShape();
 		p5.vertex(p.x - size / 2, p.y);
 		p5.vertex(p.x, p.y - size / 2);
 		p5.vertex(p.x + size / 2, p.y);
 		p5.vertex(p.x, p.y + size / 2);
 		p5.endShape(p5.CLOSE);
+	});
 
+	// Extras
+	points.forEach((p, i) => {
 		//center
-		p5.ellipse(p.x, p.y, 12, 12);
+		p5.fill('white');
+		p5.ellipse(p.x, p.y, 16, 16);
 
 		//index
-		p5.fill(0,0,0);
+		p5.fill(0, 0, 0);
 		p5.text(i, p.x - 6, p.y + 20);
 	});
 
-	//draw rects
-	p5.fill(255, 0, 0, 78);
-	
-
-	//TODO: This wil be codelike for boats or actioned grid indexes
-	for (let t = 0; t < 100; t++) {
-		let p = get_random(points);
-		let i = points.indexOf(p);
-		if (
-			p.z == 1 && //enabled
-			i < points.length - totalPerRow //not the last row
-		) {
-			p.z = 0;
-			let quad = [];
-			if (p.orientation == "right" && points[i + totalPerRow].z == 1) {
-				points[i + totalPerRow].z = 0;
-				quad.push(p5.createVector(p.x - size / 2 + space, p.y));
-				quad.push(p5.createVector(p.x, p.y - size / 2 + space));
-				quad.push(p5.createVector(p.x + size - space, p.y + size / 2));
-				quad.push(p5.createVector(p.x + size / 2, p.y + size - space));
-			}
-			else if (p.orientation == "left" && points[i + totalPerRow - 1].z == 1) {
-				points[i + totalPerRow - 1].z = 0;
-				quad.push(p5.createVector(p.x - size + space, p.y + size / 2));
-				quad.push(p5.createVector(p.x, p.y - size / 2 + space));
-				quad.push(p5.createVector(p.x + size / 2 - space, p.y));
-				quad.push(p5.createVector(p.x - size / 2, p.y + size - space));
-			}
-			drawRoundedPolygon(quad, radius);
-		}
-	}
 	p5.noFill();
 	p5.noStroke();
 }
@@ -193,8 +254,49 @@ function drawRoundedPolygon(points, radius) {
 		p5.vertex(p1.x, p1.y);
 		p5.bezierVertex(c[0], c[1], c[2], c[3], p3.x, p3.y);
 	}
+	
 	p5.endShape(p5.CLOSE);
 };
 
 const p5 = new P5(sketch);
+//Game Init
+const scdStart = new Vector();
+scdStart.y = size * nbRow + middleSpacer;
+
+const attakGrid: MyVect[] = setupIsoGrid(p5);
+const defenseGrid: MyVect[] = setupIsoGrid(p5, scdStart);
+
+const newShip = new Ship();
+newShip.orientation = "dDown";
+newShip.gridIndex = 0;
+
+const newShip2 = new Ship();
+newShip2.orientation = "dUp";
+newShip2.gridIndex = 25;
+
+const newShip3 = new Ship();
+newShip3.orientation = "side";
+newShip3.gridIndex = 50;
+
+const newShip4 = new Ship();
+newShip4.orientation = "bottom";
+newShip4.gridIndex = 100;
+
+function gameLoop(p5:P5) {
+	p5.clear();
+	drawIsoGrid(p5, attakGrid);
+	drawIsoGrid(p5, defenseGrid);
+	newShip.draw(newShip);
+	newShip2.draw(newShip2);
+	newShip3.draw(newShip3);
+	newShip4.draw(newShip4);
+}
+
+window.setInterval(() => {
+	newShip.gridIndex++;
+	newShip2.gridIndex++;
+	newShip3.gridIndex++;
+	newShip4.gridIndex++;
+},250);
+
 export default p5;

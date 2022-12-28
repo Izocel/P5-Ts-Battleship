@@ -1,7 +1,14 @@
 $bg-color: #283747;
 $txt-color: white;
 
+html {
+    height: 100%;
+    width: 100%;
+}
+
 body {
+    height: 100%;
+    width: 100%;
 	box-sizing: border-box;
 	padding: 0;
 	margin: 0;
