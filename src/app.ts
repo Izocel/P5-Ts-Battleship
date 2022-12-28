@@ -1,4 +1,4 @@
-import P5 from "p5";
+import P5, { Vector } from "p5";
 import "p5/lib/addons/p5.dom";
 import "p5/lib/addons/p5.sound";
 import "./styles.scss";
@@ -14,8 +14,8 @@ class MyVect extends P5.Vector {
 	public orientation?: string = "none";
 }
 
-var points: MyVect[] = [];
-var totalPerRow;
+let points: MyVect[] = [];
+let totalPerRow;
 
 let canvaWidth = window.screen.width-50;
 let canvaHeight = window.screen.height-50;
@@ -24,6 +24,7 @@ let canvaHeight = window.screen.height-50;
 const size = 100;
 const radius = 1;
 const space = 10;
+const middleSpacer = 200;
 
 const nbCol = 10;
 const nbRow = 10;
@@ -44,8 +45,13 @@ const sketch = (p5: P5) => {
 		cnv.parent('app');
 		
 		//Game Init
-		setupIsoGrid(p5);
-		drawIsoGrid(p5);
+		const newPoints:MyVect[] = setupIsoGrid(p5);
+		drawIsoGrid(p5, newPoints);
+
+		const scdStart = new Vector();
+		scdStart.y = size*nbRow + middleSpacer;
+		const newPoints2:MyVect[] = setupIsoGrid(p5, scdStart);
+		drawIsoGrid(p5, newPoints2);
 
 		// The game loop
 		p5.draw = () => {
@@ -53,12 +59,13 @@ const sketch = (p5: P5) => {
 	}
 }
 
-function setupIsoGrid(p5: P5) {
-	for (var y = size / 2; y < height; y += size / 2) {
-		var x = ((y) % (size) == 0) ? size : size / 2;
-		var firstInRow = true;
+function setupIsoGrid(p5: P5, start:Vector = new Vector()):MyVect[] {
+	let points:MyVect[] = [];
+	for (let y = size / 2; y < height; y += size / 2) {
+		let x = ((y) % (size) == 0) ? size : size / 2;
+		let firstInRow = true;
 		for (; x < width; x += size) {
-			var p: MyVect = p5.createVector(x, y, 1);
+			let p: MyVect = p5.createVector(x, y + start.y, 1);
 			p.orientation = get_random(["left", "right"]);
 			if (firstInRow) {
 				//first point in a row cannot be left oriented
@@ -71,13 +78,18 @@ function setupIsoGrid(p5: P5) {
 		points[points.length - 1].orientation = "left";
 		if (!totalPerRow) totalPerRow = points.length;
 	}
+
+	return points;
 }
 
-function drawIsoGrid(p5: P5) {
-	p5.background(220);
+function drawIsoGrid(p5: P5, points:MyVect[]) {
+
+
 	//draw grid
 	points.forEach((p, i) => {
-		//border
+		p5.fill(255,255,255);
+		p5.stroke(0,0,0);
+		
 		p5.beginShape();
 		p5.vertex(p.x - size / 2, p.y);
 		p5.vertex(p.x, p.y - size / 2);
@@ -86,24 +98,27 @@ function drawIsoGrid(p5: P5) {
 		p5.endShape(p5.CLOSE);
 
 		//center
-		p5.ellipse(p.x, p.y, 8, 8);
+		p5.ellipse(p.x, p.y, 12, 12);
 
 		//index
-		//p5.text(i, p.x - 5, p.y + 5);
+		p5.fill(0,0,0);
+		p5.text(i, p.x - 6, p.y + 20);
 	});
 
 	//draw rects
 	p5.fill(255, 0, 0, 78);
-	//noStroke();
-	for (var t = 0; t < 100; t++) {
-		var p = get_random(points);
-		var i = points.indexOf(p);
+	
+
+	//TODO: This wil be codelike for boats or actioned grid indexes
+	for (let t = 0; t < 100; t++) {
+		let p = get_random(points);
+		let i = points.indexOf(p);
 		if (
 			p.z == 1 && //enabled
 			i < points.length - totalPerRow //not the last row
 		) {
 			p.z = 0;
-			var quad = [];
+			let quad = [];
 			if (p.orientation == "right" && points[i + totalPerRow].z == 1) {
 				points[i + totalPerRow].z = 0;
 				quad.push(p5.createVector(p.x - size / 2 + space, p.y));
@@ -121,6 +136,8 @@ function drawIsoGrid(p5: P5) {
 			drawRoundedPolygon(quad, radius);
 		}
 	}
+	p5.noFill();
+	p5.noStroke();
 }
 
 function convertToClosed(points, radius) {
@@ -128,10 +145,10 @@ function convertToClosed(points, radius) {
 	// a 180 degree angle means f can be 1, a 10 degree angle needs
 	// an f closer to 4!
 	const f = 2.5;
-	var closed = [];
-	var p1, p2, p3, p2l, p2l_guide, p2r, p2r_guide, pc;
-	var dx1, dy1, dx2, dy2, m;
-	for (var i = 0, last = points.length; i < last; i++) { // >
+	let closed = [];
+	let p1, p2, p3, p2l, p2l_guide, p2r, p2r_guide, pc;
+	let dx1, dy1, dx2, dy2, m;
+	for (let i = 0, last = points.length; i < last; i++) { // >
 		p1 = points[i];
 		p2 = points[(i + 1) % last];
 		p3 = points[(i + 2) % last];
@@ -154,7 +171,7 @@ function convertToClosed(points, radius) {
 }
 
 function roundIsosceles(p1, p2, p3, t) {
-	var mt = 1 - t,
+	let mt = 1 - t,
 		c1x = (mt * p1.x + t * p2.x),
 		c1y = (mt * p1.y + t * p2.y),
 		c2x = (mt * p3.x + t * p2.x),
@@ -163,15 +180,15 @@ function roundIsosceles(p1, p2, p3, t) {
 }
 
 function drawRoundedPolygon(points, radius) {
-	var closed = convertToClosed(points, radius);
-	var p1, p2, p3;
+	let closed = convertToClosed(points, radius);
+	let p1, p2, p3;
 	p5.beginShape();
-	for (var i = 0, last = closed.length; i < last; i += 3) { //>
+	for (let i = 0, last = closed.length; i < last; i += 3) { //>
 		p1 = closed[i];
 		p2 = closed[i + 1];
 		p3 = closed[i + 2];
 		// rounded isosceles triangle connector values:
-		var c = roundIsosceles(p1, p2, p3, 0.75);
+		let c = roundIsosceles(p1, p2, p3, 0.75);
 		// tell Processing that we have points to add to our shape:
 		p5.vertex(p1.x, p1.y);
 		p5.bezierVertex(c[0], c[1], c[2], c[3], p3.x, p3.y);
