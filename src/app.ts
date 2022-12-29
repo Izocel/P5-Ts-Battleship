@@ -52,6 +52,75 @@ class MyVect extends P5.Vector {
 	public orientation?: string;
 	public fillColor?:string;
 	public strokeColor?:string;
+	public isMouseHover?:boolean;
+}
+
+class IsoGrid {
+	private p5:P5;
+	public type: string;
+	public points:MyVect[];
+	public hoverFillColor:string;
+	public hoverStrokeColor?:string;
+	public fillColor:string = "white";
+	public strokeColor:string = "black";
+
+	constructor(p5:P5) {
+		this.p5 = p5;
+		this.points = [];
+	}
+
+	setupIsoGrid(start: Vector = new Vector()): MyVect[] {
+		for (let y = size / 2; y < height; y += size / 2) {
+			let x = ((y) % (size) == 0) ? size : size / 2;
+			let firstInRow = true;
+			for (; x < width; x += size) {
+				let p: MyVect = p5.createVector(x, y + start.y, 1);
+				p.orientation = getRndInArray(["dUp", "dDown"]);
+				if (firstInRow) {
+					//first point in a row cannot be dUp oriented
+					firstInRow = false;
+					p.orientation = "dDown";
+				}
+				p.isMouseHover = false;
+				this.points.push(p);
+			}
+	
+			//last point in a row cannot be dDown oriented
+			this.points[this.points.length - 1].orientation = "dUp";
+		}
+	
+		return this.points;
+	}
+	
+	drawIsoGrid() {
+		this.points.forEach((p:MyVect, i) => {
+			const fill = p.isMouseHover ? this.hoverFillColor : this.fillColor;
+			const stroke = p.isMouseHover ? this.hoverStrokeColor : this.strokeColor;
+			p5.fill(fill);
+			p5.stroke(stroke);
+	
+			p5.beginShape();
+			p5.vertex(p.x - size / 2, p.y);
+			p5.vertex(p.x, p.y - size / 2);
+			p5.vertex(p.x + size / 2, p.y);
+			p5.vertex(p.x, p.y + size / 2);
+			p5.endShape(p5.CLOSE);
+		});
+	
+		// Extras
+		this.points.forEach((p, i) => {
+			//center
+			p5.fill('white');
+			p5.ellipse(p.x, p.y, 16, 16);
+	
+			//index
+			p5.fill(0, 0, 0);
+			p5.text(i, p.x - 6, p.y + 20);
+		});
+	
+		p5.noFill();
+		p5.noStroke();
+	}
 }
 
 /**
@@ -62,7 +131,7 @@ class MyVect extends P5.Vector {
  * TODO:Destroyer (2)  
  */
 class Ship extends MyVect {
-	grid:MyVect[] = defenseGrid;
+	grid:IsoGrid = defenseGrid;
 	gridIndex:number;
 	maxHp:number = 2;
 	hp:number = this.maxHp;
@@ -71,11 +140,11 @@ class Ship extends MyVect {
 
 	//draw colords rects
 	draw(ship:Ship) {
-		let p = this.grid[this.gridIndex];
+		let p = this.grid.points[this.gridIndex];
 
 		if(!p) {
 			this.gridIndex = 0;
-			p = this.grid[this.gridIndex];
+			p = this.grid.points[this.gridIndex];
 		}
 
 		let quad = [];
@@ -115,59 +184,6 @@ class Ship extends MyVect {
 
 function windowResized() {
 	p5.resizeCanvas(canvaWidth, canvaHeight);
-}
-
-function setupIsoGrid(p5: P5, start: Vector = new Vector()): MyVect[] {
-	let points:MyVect[] = [];
-	for (let y = size / 2; y < height; y += size / 2) {
-		let x = ((y) % (size) == 0) ? size : size / 2;
-		let firstInRow = true;
-		for (; x < width; x += size) {
-			let p: MyVect = p5.createVector(x, y + start.y, 1);
-			p.orientation = getRndInArray(["dUp", "dDown"]);
-			p.fillColor = "white";
-			p.strokeColor = "black";
-			if (firstInRow) {
-				//first point in a row cannot be dUp oriented
-				firstInRow = false;
-				p.orientation = "dDown";
-			}
-			points.push(p);
-		}
-
-		//last point in a row cannot be dDown oriented
-		points[points.length - 1].orientation = "dUp";
-	}
-
-	return points;
-}
-
-function drawIsoGrid(p5: P5, points: MyVect[]) {
-	points.forEach((p:MyVect, i) => {
-		p5.fill(p.fillColor);
-		p5.stroke(p.strokeColor);
-
-		p5.beginShape();
-		p5.vertex(p.x - size / 2, p.y);
-		p5.vertex(p.x, p.y - size / 2);
-		p5.vertex(p.x + size / 2, p.y);
-		p5.vertex(p.x, p.y + size / 2);
-		p5.endShape(p5.CLOSE);
-	});
-
-	// Extras
-	points.forEach((p, i) => {
-		//center
-		p5.fill('white');
-		p5.ellipse(p.x, p.y, 16, 16);
-
-		//index
-		p5.fill(0, 0, 0);
-		p5.text(i, p.x - 6, p.y + 20);
-	});
-
-	p5.noFill();
-	p5.noStroke();
 }
 
 function convertToClosed(points, radius) {
@@ -227,23 +243,23 @@ function drawRoundedPolygon(points, radius) {
 	p5.endShape(p5.CLOSE);
 };
 
-function getGridForMouse(grid:MyVect[]) {
+function getVectsFromMouse(vects:MyVect[]) {
 	let mouseVect = new MyVect();
 	mouseVect.x = Math.floor(p5.mouseX);
 	mouseVect.y = Math.floor(p5.mouseY);
 
 	const offset = 40;
 
-	grid = grid.filter(v => {return v.x-offset <= mouseVect.x && v.x+offset >= mouseVect.x 
+	vects = vects.filter(v => {return v.x-offset <= mouseVect.x && v.x+offset >= mouseVect.x 
 		&& v.y-offset <= mouseVect.y && v.y+offset >= mouseVect.y});	
 	
 	let found = null;
-	if(grid.length >= 0 && grid.length < 10) {
+	if(vects.length >= 0 && vects.length < 10) {
 		const deltas = [];
 		let foundI = 0;
 		let minX = canvaWidth;
-		for (let i = 0; i < grid.length; i++) {
-			const v = grid[i];
+		for (let i = 0; i < vects.length; i++) {
+			const v = vects[i];
 			const deltaX = mouseVect.x-v.x;
 			deltas.push(deltaX);
 
@@ -255,7 +271,13 @@ function getGridForMouse(grid:MyVect[]) {
 			
 		}
 
-		found = grid[foundI];
+		found = vects[foundI];
+
+		if(found) {
+			found.isMouseHover = true;
+			p5.mouseX = found.x
+			p5.mouseY = found.y
+		}
 	}
 
 	return found;
@@ -271,35 +293,26 @@ function mouseCursor() {
 function gameLoop(p5:P5) {
 	p5.clear();
 	document.getElementById("app").style.cursor = "auto"
-	drawIsoGrid(p5, attakGrid);
-	drawIsoGrid(p5, defenseGrid);
+	attakGrid.drawIsoGrid();
+	defenseGrid.drawIsoGrid();
+
 	newShip.draw(newShip);
 	newShip2.draw(newShip2);
 	newShip3.draw(newShip3);
 	newShip4.draw(newShip4);
 
-	// Grids resets
-	for (let i = 0; i < attakGrid.length; i++) {
-		attakGrid[i].fillColor = "white";
-		attakGrid[i].strokeColor = "black";
-		defenseGrid[i].fillColor = "white";
-		defenseGrid[i].strokeColor = "black";
+	for (let i = 0; i < attakGrid.points.length; i++) {
+		const va = attakGrid.points[i];
+		const vd = defenseGrid.points[i];
+		va.isMouseHover = false;
+		vd.isMouseHover = false;
 	}
 	
 	let mouseGrid = null;
-	if(p5.mouseY <= defenseGrid[0].y)
-		mouseGrid = getGridForMouse(attakGrid);
+	if(p5.mouseY <= defenseGrid.points[0].y)
+		mouseGrid = getVectsFromMouse(attakGrid.points);
 	else
-		mouseGrid = getGridForMouse(defenseGrid);
-
-	if(mouseGrid) {
-		mouseGrid.fillColor = "blue";
-		mouseGrid.strokeColor = "white";
-		
-		p5.mouseX = mouseGrid.x
-		p5.mouseY = mouseGrid.y
-		document.getElementById("app").style.cursor = "crosshair"
-	}
+		mouseGrid = getVectsFromMouse(defenseGrid.points);
 
 }
 
@@ -326,8 +339,19 @@ const p5 = new P5(sketch);
 
 const scdStart = new Vector();
 scdStart.y = size * nbRow + middleSpacer;
-const attakGrid:MyVect[] = setupIsoGrid(p5);
-const defenseGrid: MyVect[] = setupIsoGrid(p5, scdStart);
+
+const attakGrid = new IsoGrid(p5);
+attakGrid.type="attack";
+attakGrid.setupIsoGrid();
+attakGrid.hoverFillColor = "red";
+attakGrid.hoverStrokeColor = "black"
+
+const defenseGrid = new IsoGrid(p5);
+defenseGrid.type="attack";
+defenseGrid.setupIsoGrid(scdStart);
+defenseGrid.hoverFillColor = "blue";
+defenseGrid.hoverStrokeColor = "white"
+
 
 const newShip = new Ship();
 newShip.orientation = "dDown";
