@@ -270,6 +270,7 @@ function mouseCursor() {
 
 function gameLoop(p5:P5) {
 	p5.clear();
+	document.getElementById("app").style.cursor = "auto"
 	drawIsoGrid(p5, attakGrid);
 	drawIsoGrid(p5, defenseGrid);
 	newShip.draw(newShip);
@@ -294,10 +295,10 @@ function gameLoop(p5:P5) {
 	if(mouseGrid) {
 		mouseGrid.fillColor = "blue";
 		mouseGrid.strokeColor = "white";
-
-		//TODO: Needs lastMouseGrid ??? no event are fired if "staticly" setted
+		
 		p5.mouseX = mouseGrid.x
 		p5.mouseY = mouseGrid.y
+		document.getElementById("app").style.cursor = "crosshair"
 	}
 
 }
@@ -327,10 +328,6 @@ const scdStart = new Vector();
 scdStart.y = size * nbRow + middleSpacer;
 const attakGrid:MyVect[] = setupIsoGrid(p5);
 const defenseGrid: MyVect[] = setupIsoGrid(p5, scdStart);
-
-console.log(attakGrid)
-console.log(defenseGrid)
-
 
 const newShip = new Ship();
 newShip.orientation = "dDown";
