@@ -63,6 +63,7 @@ class IsoGrid {
 	public hoverStrokeColor?:string;
 	public fillColor:string = "white";
 	public strokeColor:string = "black";
+	public mouseVect:unknown|MyVect;
 
 	constructor(p5:P5) {
 		this.p5 = p5;
@@ -94,6 +95,7 @@ class IsoGrid {
 	
 	drawIsoGrid() {
 		this.points.forEach((p:MyVect, i) => {
+			p.isMouseHover = this.mouseVect == p;
 			const fill = p.isMouseHover ? this.hoverFillColor : this.fillColor;
 			const stroke = p.isMouseHover ? this.hoverStrokeColor : this.strokeColor;
 			p5.fill(fill);
@@ -243,14 +245,13 @@ function drawRoundedPolygon(points, radius) {
 	p5.endShape(p5.CLOSE);
 };
 
-function getVectsFromMouse(vects:MyVect[]) {
+function getVectsFromMouse(grid:IsoGrid) {
 	let mouseVect = new MyVect();
 	mouseVect.x = Math.floor(p5.mouseX);
 	mouseVect.y = Math.floor(p5.mouseY);
 
 	const offset = 40;
-
-	vects = vects.filter(v => {return v.x-offset <= mouseVect.x && v.x+offset >= mouseVect.x 
+	let vects = grid.points.filter(v => {return v.x-offset <= mouseVect.x && v.x+offset >= mouseVect.x 
 		&& v.y-offset <= mouseVect.y && v.y+offset >= mouseVect.y});	
 	
 	let found = null;
@@ -274,7 +275,7 @@ function getVectsFromMouse(vects:MyVect[]) {
 		found = vects[foundI];
 
 		if(found) {
-			found.isMouseHover = true;
+			grid.mouseVect = found;
 			p5.mouseX = found.x
 			p5.mouseY = found.y
 		}
@@ -301,18 +302,15 @@ function gameLoop(p5:P5) {
 	newShip3.draw(newShip3);
 	newShip4.draw(newShip4);
 
-	for (let i = 0; i < attakGrid.points.length; i++) {
-		const va = attakGrid.points[i];
-		const vd = defenseGrid.points[i];
-		va.isMouseHover = false;
-		vd.isMouseHover = false;
-	}
+
+	attakGrid.mouseVect = null;
+	defenseGrid.mouseVect = null;
 	
 	let mouseGrid = null;
 	if(p5.mouseY <= defenseGrid.points[0].y)
-		mouseGrid = getVectsFromMouse(attakGrid.points);
+		mouseGrid = getVectsFromMouse(attakGrid);
 	else
-		mouseGrid = getVectsFromMouse(defenseGrid.points);
+		mouseGrid = getVectsFromMouse(defenseGrid);
 
 }
 
@@ -350,7 +348,7 @@ const defenseGrid = new IsoGrid(p5);
 defenseGrid.type="attack";
 defenseGrid.setupIsoGrid(scdStart);
 defenseGrid.hoverFillColor = "blue";
-defenseGrid.hoverStrokeColor = "white"
+defenseGrid.hoverStrokeColor = "black"
 
 
 const newShip = new Ship();
