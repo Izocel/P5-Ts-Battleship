@@ -15,7 +15,7 @@ const height = size * nbRow;
 
 const shipNames = [
 	"Carrier",
-	"battle",
+	"Battle",
 	"Cruiser",
 	"Submarine",
 	"Destroyer"
@@ -26,7 +26,7 @@ const shipColors = {
 		stroke: () => p5.stroke('black'),
 		fill: () => p5.fill('MediumSeaGreen')
 	},
-	battle: {
+	Battle: {
 		stroke: () => p5.stroke('black'),
 		fill: () => p5.fill('SlateBlue')
 	},
@@ -64,10 +64,17 @@ class IsoGrid {
 	public fillColor:string = "white";
 	public strokeColor:string = "black";
 	public mouseVect:unknown|MyVect;
+	ships: any;
 
 	constructor(p5:P5) {
 		this.p5 = p5;
 		this.points = [];
+		this.ships = {
+			Carrier:Ship,
+			Battle:Ship,
+			Submarine:Ship,
+			Destroyer:Ship
+		}
 	}
 
 	setupIsoGrid(start: Vector = new Vector()): MyVect[] {
@@ -133,48 +140,81 @@ class IsoGrid {
  * TODO:Destroyer (2)  
  */
 class Ship extends MyVect {
-	grid:IsoGrid = defenseGrid;
-	gridIndex:number;
+	grid:IsoGrid;
+	gridStart:number;
+	gridStop:number;
 	maxHp:number = 2;
 	hp:number = this.maxHp;
 	name:string = "Destroyer";
 	colors = shipColors[this.name];
 
-	//draw colords rects
-	draw(ship:Ship) {
-		let p = this.grid.points[this.gridIndex];
+	constructor(name:string = "Destroyer", pv:number=2, grid:IsoGrid = defenseGrid) {
+		super();
+		this.hp = pv;
+		this.maxHp = pv;
+		this.grid = grid;
 
-		if(!p) {
-			this.gridIndex = 0;
-			p = this.grid.points[this.gridIndex];
-		}
+		this.grid.ships[this.name] = this;
+	}
+
+	//draw colords rects
+	draw() {
+		let p = this.grid.points[this.gridStart];
+
+		if(!p) {return;}
 
 		let quad = [];
 		if (this.orientation == "dDown") {
-			quad.push(p5.createVector(p.x - size / 2 + space, p.y));
-			quad.push(p5.createVector(p.x, p.y - size / 2 + space));
-			quad.push(p5.createVector(p.x + size - space, p.y + size / 2));
-			quad.push(p5.createVector(p.x + size / 2, p.y + size - space));
+			const indexDelta = nbCol*(this.maxHp-1);
+			this.gridStop = this.gridStart + indexDelta;
+			let pEnd = this.grid.points[this.gridStop];
+			if(!pEnd)
+				return;
+			
+			quad.push(p5.createVector(p.x, p.y - size/2 + space));
+			quad.push(p5.createVector(pEnd.x + size/2 - space, pEnd.y));
+
+			quad.push(p5.createVector(pEnd.x, pEnd.y + size/2 - space));
+			quad.push(p5.createVector(p.x - size/2 + space, p.y));
 		}
 		else if (this.orientation == "dUp") {
-			quad.push(p5.createVector(p.x - size + space, p.y + size / 2));
-			quad.push(p5.createVector(p.x, p.y - size / 2 + space));
-			quad.push(p5.createVector(p.x + size / 2 - space, p.y));
-			quad.push(p5.createVector(p.x - size / 2, p.y + size - space));
+			const indexDelta = (nbCol-1)*(this.maxHp-1);
+			this.gridStop = this.gridStart - indexDelta;
+			let pEnd = this.grid.points[this.gridStop];
+			if(!pEnd)
+				return;
+			
+			quad.push(p5.createVector(p.x - size/2 + space, p.y));
+			quad.push(p5.createVector(pEnd.x, pEnd.y - size/2 + space));
+			quad.push(p5.createVector(pEnd.x + size/2 - space, pEnd.y));
+			quad.push(p5.createVector(p.x, p.y + size/2 - space));
+
 		}
 		else if (this.orientation == "side") {
-			quad.push(p5.createVector(p.x - space, p.y - size/4 - space/2));
-			quad.push(p5.createVector(p.x + size + space, p.y - size/4 - space/2));
+			const indexDelta = (this.maxHp-1);
+			this.gridStop = this.gridStart + indexDelta;
+			let pEnd = this.grid.points[this.gridStop];
+			if(!pEnd)
+				return;
 
-			quad.push(p5.createVector(p.x + size + space, p.y + size/4 + space/2));
+			const long = size*(this.maxHp-1);
+			quad.push(p5.createVector(p.x - space, p.y - size/4 - space));
+			quad.push(p5.createVector(p.x + long + space, p.y - size/4 - space));
+			quad.push(p5.createVector(p.x + long + space, p.y + size/4 + space/2));
 			quad.push(p5.createVector(p.x - space, p.y + size/4 + space/2));
 		}
 		else if (this.orientation == "bottom") {
+			const indexDelta = 2*nbCol*(this.maxHp-1) - this.maxHp + 1;
+			this.gridStop = this.gridStart + indexDelta;
+			let pEnd = this.grid.points[this.gridStop];
+			if(!pEnd)
+				return;
+
+			const long = size*(this.maxHp-1);
 			quad.push(p5.createVector(p.x + size/2 - space*2, p.y - size/4 + space));
 			quad.push(p5.createVector(p.x - size/2 + space*2, p.y - size/4 + space));
-
-			quad.push(p5.createVector(p.x - size/2 + space*2, p.y + size + space));
-			quad.push(p5.createVector(p.x + size/2 - space*2, p.y + size + space));
+			quad.push(p5.createVector(p.x - size/2 + space*2, p.y + long + space));
+			quad.push(p5.createVector(p.x + size/2 - space*2, p.y + long + space));
 		}
 		
 		this.colors.fill();
@@ -297,11 +337,11 @@ function gameLoop(p5:P5) {
 	attakGrid.drawIsoGrid();
 	defenseGrid.drawIsoGrid();
 
-	newShip.draw(newShip);
-	newShip2.draw(newShip2);
-	newShip3.draw(newShip3);
-	newShip4.draw(newShip4);
-
+	Carrier.draw();
+	Battleship.draw();
+	Cruiser.draw();
+	Submarine.draw();
+	Destroyer.draw();
 
 	attakGrid.mouseVect = null;
 	defenseGrid.mouseVect = null;
@@ -345,35 +385,47 @@ attakGrid.hoverFillColor = "red";
 attakGrid.hoverStrokeColor = "black"
 
 const defenseGrid = new IsoGrid(p5);
-defenseGrid.type="attack";
+defenseGrid.type="defense";
 defenseGrid.setupIsoGrid(scdStart);
 defenseGrid.hoverFillColor = "blue";
 defenseGrid.hoverStrokeColor = "black"
 
+const Carrier = new Ship("Carrier", 5);
+Carrier.orientation = "dDown";
+Carrier.gridStart = 33;
 
-const newShip = new Ship();
-newShip.orientation = "dDown";
-newShip.gridIndex = 0;
+const Battleship = new Ship("Battleship", 4);
+Battleship.orientation = "dUp";
+Battleship.gridStart = 34;
 
-const newShip2 = new Ship();
-newShip2.orientation = "dUp";
-newShip2.gridIndex = 25;
+const Cruiser = new Ship("Cruiser", 3);
+Cruiser.orientation = "side";
+Cruiser.gridStart = 50;
 
-const newShip3 = new Ship();
-newShip3.orientation = "side";
-newShip3.gridIndex = 50;
+const Submarine = new Ship("Submarine", 3);
+Submarine.orientation = "bottom";
+Submarine.gridStart = 100;
 
-const newShip4 = new Ship();
-newShip4.orientation = "bottom";
-newShip4.gridIndex = 100;
+const Destroyer = new Ship("Destroyer", 2);
+Destroyer.orientation = "dUp";
+Destroyer.gridStart = 125;
 
 
-window.setInterval(() => {
-	newShip.gridIndex++;
-	newShip2.gridIndex++;
-	newShip3.gridIndex++;
-	newShip4.gridIndex++;
-},1000);
+// window.setInterval(() => {
+// 	Carrier.gridStart++;
+// 	Battleship.gridStart++;
+// 	Cruiser.gridStart++;
+// 	Submarine.gridStart++;
+// 	Destroyer.gridStart++;
+// },1000);
 
+
+export {
+	attakGrid,
+	defenseGrid
+};
+
+console.log(attakGrid)
+console.log(defenseGrid)
 
 export default p5;
