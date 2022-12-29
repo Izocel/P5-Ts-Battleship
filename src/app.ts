@@ -3,6 +3,15 @@ import "p5/lib/addons/p5.dom";
 import "p5/lib/addons/p5.sound";
 import "./styles.scss";
 
+const size = 64+16;
+const radius = 1;
+const space = 8;
+const middleSpacer = 50;
+
+const nbCol = 10;
+const nbRow = 10;
+const width = size * nbCol;
+const height = size * nbRow;
 
 const shipNames = [
 	"Carrier",
@@ -35,14 +44,15 @@ const shipColors = {
 	}
 };
 
-function get_random(list: any): any {
+function getRndInArray(list: any): any {
 	return list[Math.floor((Math.random() * list.length))];
 }
 
 class MyVect extends P5.Vector {
-	public orientation?: string = "none";
+	public orientation?: string;
+	public fillColor?:string;
+	public strokeColor?:string;
 }
-
 
 /**
  * TODO:Carrier (5), 
@@ -103,50 +113,8 @@ class Ship extends MyVect {
 }
 
 
-let points: MyVect[] = [];
-let totalPerRow;
-
-let canvaWidth = window.screen.width - 50;
-let canvaHeight = window.screen.height - 50;
-
-// Grid
-const rowNames: string[] = [
-	'a', 'b', 'c',
-	'd', 'e', 'f',
-	'g', 'h',
-	'i', 'j'
-]
-
-const rowsDef = [];
-const colsDef = [];
-
-const size = 80;
-const radius = 1;
-const space = 10;
-const middleSpacer = 50;
-
-const nbCol = 10;
-const nbRow = 10;
-const width = size * nbCol;
-const height = size * nbRow;
-
-
 function windowResized() {
 	p5.resizeCanvas(canvaWidth, canvaHeight);
-}
-
-// Creating the sketch itself
-const sketch = (p5: P5) => {
-	p5.setup = () => {
-		const cnv = p5.createCanvas(canvaWidth, canvaHeight);
-		cnv.style('display', 'block');
-		cnv.parent('app');
-
-		// The game loop
-		p5.draw = () => {
-			gameLoop(p5);
-		};
-	}
 }
 
 function setupIsoGrid(p5: P5, start: Vector = new Vector()): MyVect[] {
@@ -156,7 +124,9 @@ function setupIsoGrid(p5: P5, start: Vector = new Vector()): MyVect[] {
 		let firstInRow = true;
 		for (; x < width; x += size) {
 			let p: MyVect = p5.createVector(x, y + start.y, 1);
-			p.orientation = get_random(["dUp", "dDown"]);
+			p.orientation = getRndInArray(["dUp", "dDown"]);
+			p.fillColor = "white";
+			p.strokeColor = "black";
 			if (firstInRow) {
 				//first point in a row cannot be dUp oriented
 				firstInRow = false;
@@ -167,16 +137,15 @@ function setupIsoGrid(p5: P5, start: Vector = new Vector()): MyVect[] {
 
 		//last point in a row cannot be dDown oriented
 		points[points.length - 1].orientation = "dUp";
-		if (!totalPerRow) totalPerRow = points.length;
 	}
 
 	return points;
 }
 
 function drawIsoGrid(p5: P5, points: MyVect[]) {
-	points.forEach((p, i) => {
-		p5.fill(255, 255, 255);
-		p5.stroke(0, 0, 0);
+	points.forEach((p:MyVect, i) => {
+		p5.fill(p.fillColor);
+		p5.stroke(p.strokeColor);
 
 		p5.beginShape();
 		p5.vertex(p.x - size / 2, p.y);
@@ -258,13 +227,110 @@ function drawRoundedPolygon(points, radius) {
 	p5.endShape(p5.CLOSE);
 };
 
-const p5 = new P5(sketch);
+function getGridForMouse(grid:MyVect[]) {
+	let mouseVect = new MyVect();
+	mouseVect.x = Math.floor(p5.mouseX);
+	mouseVect.y = Math.floor(p5.mouseY);
+
+	const offset = 40;
+
+	grid = grid.filter(v => {return v.x-offset <= mouseVect.x && v.x+offset >= mouseVect.x 
+		&& v.y-offset <= mouseVect.y && v.y+offset >= mouseVect.y});	
+	
+	let found = null;
+	if(grid.length >= 0 && grid.length < 10) {
+		const deltas = [];
+		let foundI = 0;
+		let minX = canvaWidth;
+		for (let i = 0; i < grid.length; i++) {
+			const v = grid[i];
+			const deltaX = mouseVect.x-v.x;
+			deltas.push(deltaX);
+
+			let newMinX = Math.min(deltaX>= 0 ? deltaX : -deltaX, minX);
+			if(newMinX !== minX) {
+				minX = newMinX;
+				foundI = i;
+			}
+			
+		}
+
+		found = grid[foundI];
+	}
+
+	return found;
+}
+
+function mouseCursor() {
+	p5.stroke('black');
+	p5.fill('Tomato');
+	p5.ellipse(p5.mouseX, p5.mouseY, 16,16);
+	return p5.mouseY;
+}
+
+function gameLoop(p5:P5) {
+	p5.clear();
+	drawIsoGrid(p5, attakGrid);
+	drawIsoGrid(p5, defenseGrid);
+	newShip.draw(newShip);
+	newShip2.draw(newShip2);
+	newShip3.draw(newShip3);
+	newShip4.draw(newShip4);
+
+	// Grids resets
+	for (let i = 0; i < attakGrid.length; i++) {
+		attakGrid[i].fillColor = "white";
+		attakGrid[i].strokeColor = "black";
+		defenseGrid[i].fillColor = "white";
+		defenseGrid[i].strokeColor = "black";
+	}
+	
+	let mouseGrid = null;
+	if(p5.mouseY <= defenseGrid[0].y)
+		mouseGrid = getGridForMouse(attakGrid);
+	else
+		mouseGrid = getGridForMouse(defenseGrid);
+
+	if(mouseGrid) {
+		mouseGrid.fillColor = "blue";
+		mouseGrid.strokeColor = "white";
+
+		//TODO: Needs lastMouseGrid ??? no event are fired if "staticly" setted
+		p5.mouseX = mouseGrid.x
+		p5.mouseY = mouseGrid.y
+	}
+
+}
+
+
+// Creating the sketch itself
+function sketch(p5: P5) {
+	p5.setup = () => {
+		const cnv = p5.createCanvas(canvaWidth, canvaHeight);
+		cnv.style('display', 'block');
+		cnv.parent('app');
+
+		// The game loop
+		p5.draw = () => {
+			gameLoop(p5);
+		};
+	}
+}
+
+
 //Game Init
+let canvaWidth = window.screen.width - 50;
+let canvaHeight = window.screen.height - 50;
+const p5 = new P5(sketch);
+
 const scdStart = new Vector();
 scdStart.y = size * nbRow + middleSpacer;
-
-const attakGrid: MyVect[] = setupIsoGrid(p5);
+const attakGrid:MyVect[] = setupIsoGrid(p5);
 const defenseGrid: MyVect[] = setupIsoGrid(p5, scdStart);
+
+console.log(attakGrid)
+console.log(defenseGrid)
+
 
 const newShip = new Ship();
 newShip.orientation = "dDown";
@@ -282,21 +348,13 @@ const newShip4 = new Ship();
 newShip4.orientation = "bottom";
 newShip4.gridIndex = 100;
 
-function gameLoop(p5:P5) {
-	p5.clear();
-	drawIsoGrid(p5, attakGrid);
-	drawIsoGrid(p5, defenseGrid);
-	newShip.draw(newShip);
-	newShip2.draw(newShip2);
-	newShip3.draw(newShip3);
-	newShip4.draw(newShip4);
-}
 
 window.setInterval(() => {
 	newShip.gridIndex++;
 	newShip2.gridIndex++;
 	newShip3.gridIndex++;
 	newShip4.gridIndex++;
-},250);
+},1000);
+
 
 export default p5;
