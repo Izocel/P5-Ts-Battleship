@@ -1,5 +1,5 @@
 import p5 from "./app";
-import { GRIDBOXRADIUS, SHIPCOLORS } from "./constants";
+import { GRIDBOXRADIUS, ORIENTATIONS, SHIPCOLORS } from "./constants";
 import IsoGrid from "./IsoGrid";
 import MyVect from "./MyVect";
 import { drawRoundedPolygon } from "./utils";
@@ -11,15 +11,43 @@ export default class Ship extends MyVect {
     maxHp: number = 2;
     hp: number = this.maxHp;
     name: string = "Destroyer";
-    colors = SHIPCOLORS[this.name];
+    colors = { ...SHIPCOLORS[this.name] };
+    hidden: boolean = false;
 
     constructor(name: string = "Destroyer", pv: number = 2, grid: IsoGrid) {
         super();
         this.hp = pv;
         this.maxHp = pv;
         this.grid = grid;
+        this.name = name;
 
         this.grid.ships[this.name] = this;
+    }
+
+    toggleHidden() {
+        if (this.hidden)
+            this.colors = { ...SHIPCOLORS[this.name] };
+        else {
+            this.colors.fill = () => p5.noFill();
+            this.colors.stroke = () => p5.noStroke();
+        }
+
+        this.hidden = !this.hidden;
+        return this.hidden;
+    }
+
+    toggleOrientation(): string {
+        if (this.orientation === "bottom" || this.orientation === "side")
+            this.gridStart += this.grid.nbCol - 1;
+
+        let index = ORIENTATIONS.indexOf(this.orientation, 0) + 1;
+        index = index > ORIENTATIONS.length - 1 ? 0 : index;
+        this.orientation = ORIENTATIONS[index];
+
+        if (this.orientation === "dDown" || this.orientation === "bottom")
+            this.gridStart -= this.grid.nbCol - 1;
+
+        return this.orientation;
     }
 
     //draw colords rects

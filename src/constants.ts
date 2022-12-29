@@ -1,7 +1,11 @@
 import p5 from "./app";
 
 export const GRIDBOXRADIUS: number = 1;
-export const MIDDLESPACER:number = 50;
+export const MIDDLESPACER: number = 50;
+
+export const ORIENTATIONS = [
+    'dUp', 'side', 'dDown', 'bottom'
+];
 
 export const SHIPNAME: string[] = [
     "Carrier",

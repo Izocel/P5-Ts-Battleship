@@ -21,13 +21,7 @@ export default class IsoGrid {
     public hoverStrokeColor?: string;
     public fillColor: string = "white";
     public strokeColor: string = "black";
-    public ships: { 
-        Carrier: typeof Ship; 
-        Battleship: typeof Ship; 
-        Cruiser: typeof Ship; 
-        Submarine: typeof Ship; 
-        Destroyer: typeof Ship; 
-    };
+    public ships;
 
     constructor(p5: P5) {
         this.p5 = p5;
