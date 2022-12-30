@@ -67,7 +67,7 @@ export function drawRoundedPolygon(points, radius) {
     p5.endShape(p5.CLOSE);
 };
 
-export function getVectsFromMouse(grid: IsoGrid) {
+export function getVectsFromMouse(grid: IsoGrid): MyVect {
     let mouseVect = new MyVect();
     mouseVect.x = Math.floor(p5.mouseX);
     mouseVect.y = Math.floor(p5.mouseY);
@@ -110,7 +110,7 @@ export function getVectsFromMouse(grid: IsoGrid) {
 
 export function drawCursor() {
     p5.fill('Tomato');
-	p5.stroke('black');
-	p5.ellipse(p5.mouseX, p5.mouseY, 16, 16);
-	return {x:p5.mouseX, y:p5.mouseY, size:16};
+    p5.stroke('black');
+    p5.ellipse(p5.mouseX, p5.mouseY, 16, 16);
+    return { x: p5.mouseX, y: p5.mouseY, size: 16 };
 }

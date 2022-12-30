@@ -36,7 +36,7 @@ export default class Ship extends MyVect {
             return 1;
         }
         else if (this.orientation == "bottom") {
-            return 1 + this.grid.nbCol * -2;
+            return this.grid.nbCol * 2 - 1;
         }
     }
 
@@ -87,8 +87,8 @@ export default class Ship extends MyVect {
 
             const p1 = this.grid.points[i1];
             const p2 = this.grid.points[i2];
-            
-            if(!check(p1, p2))
+
+            if (!check(p1, p2))
                 return false;
         }
 
@@ -146,7 +146,7 @@ export default class Ship extends MyVect {
     //draw colords rects
     draw() {
         this.updateGridIndex();
-        if(!this.checkVectIntegrity())
+        if (!this.checkVectIntegrity())
             return;
 
         const gridStart = this.gridIndex[0];
@@ -173,17 +173,17 @@ export default class Ship extends MyVect {
         }
         else if (this.orientation == "side") {
             const long = this.grid.size * (this.maxHp - 1);
-            quad.push(p5.createVector(p.x - this.grid.padding, p.y - this.grid.size / 4 - this.grid.padding));
-            quad.push(p5.createVector(p.x + long + this.grid.padding, p.y - this.grid.size / 4 - this.grid.padding));
-            quad.push(p5.createVector(p.x + long + this.grid.padding, p.y + this.grid.size / 4 + this.grid.padding / 2));
-            quad.push(p5.createVector(p.x - this.grid.padding, p.y + this.grid.size / 4 + this.grid.padding / 2));
+            quad.push(p5.createVector(p.x - this.grid.padding * 1.5, p.y - this.grid.size / 4 - this.grid.padding));
+            quad.push(p5.createVector(p.x + long + this.grid.padding * 2, p.y - this.grid.size / 4 - this.grid.padding));
+            quad.push(p5.createVector(p.x + long + this.grid.padding * 2, p.y + this.grid.size / 4 + this.grid.padding / 2));
+            quad.push(p5.createVector(p.x - this.grid.padding * 1.5, p.y + this.grid.size / 4 + this.grid.padding / 2));
         }
         else if (this.orientation == "bottom") {
             const long = this.grid.size * (this.maxHp - 1);
             quad.push(p5.createVector(p.x + this.grid.size / 2 - this.grid.padding * 2, p.y - this.grid.size / 4 + this.grid.padding));
             quad.push(p5.createVector(p.x - this.grid.size / 2 + this.grid.padding * 2, p.y - this.grid.size / 4 + this.grid.padding));
-            quad.push(p5.createVector(p.x - this.grid.size / 2 + this.grid.padding * 2, p.y + long + this.grid.padding));
-            quad.push(p5.createVector(p.x + this.grid.size / 2 - this.grid.padding * 2, p.y + long + this.grid.padding));
+            quad.push(p5.createVector(p.x - this.grid.size / 2 + this.grid.padding * 2, p.y + long + this.grid.padding * 1.5));
+            quad.push(p5.createVector(p.x + this.grid.size / 2 - this.grid.padding * 2, p.y + long + this.grid.padding * 1.5));
         }
 
         this.colors.fill();

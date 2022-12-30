@@ -4,14 +4,16 @@ import "p5/lib/addons/p5.sound";
 import "./SCSS/styles.scss";
 
 import IsoGrid from "./IsoGrid";
-import { getVectsFromMouse } from "./utils";
 import Ship from "./Ship";
+
+import { getVectsFromMouse } from "./utils";
 import { MIDDLESPACER } from "./constants";
+import MyVect from "./MyVect";
 
 // Creating the sketch itself
 function sketch(p5: P5) {
 	p5.setup = () => {
-		const cnv = p5.createCanvas(canvaWidth, canvaHeight);
+		const cnv = p5.createCanvas(canvaWidth * 2, canvaHeight * 2);
 		cnv.style('display', 'block');
 		cnv.parent('app');
 
@@ -33,49 +35,51 @@ function gameLoop(p5: P5) {
 	Submarine.draw();
 	Destroyer.draw();
 
+	attakGrid.drawGridPin()
+	defenseGrid.drawGridPin()
+
 	attakGrid.mouseVect = null;
 	defenseGrid.mouseVect = null;
 
-	let mouseGrid = null;
-	if (p5.mouseY <= defenseGrid.points[0].y)
+	let mouseGrid: MyVect = null;
+	if (p5.mouseY <= defenseGrid.points[0].y) {
 		mouseGrid = getVectsFromMouse(attakGrid);
-	else
+	}
+	else {
 		mouseGrid = getVectsFromMouse(defenseGrid);
+	}
 
 }
 
 //Game Init
-let canvaWidth = window.screen.width - 50;
-let canvaHeight = window.screen.height - 50;
+let canvaWidth = window.screen.width;
+let canvaHeight = window.screen.height;
 const p5 = new P5(sketch);
 
-const attakGrid = new IsoGrid(p5);
-attakGrid.nbCol = 2;
-attakGrid.nbRow = 2;
-attakGrid.padding = 8;
-attakGrid.size = 64 + 16;
+const nbColRow = 10;
+const padding = 8;
+let calcHeight = 64 + 32;
+
+const attakGrid = new IsoGrid(p5, 'attack');
+attakGrid.nbCol = nbColRow;
+attakGrid.nbRow = nbColRow;
+attakGrid.padding = padding;
+attakGrid.size = calcHeight;
 attakGrid.height = attakGrid.nbCol * attakGrid.size;
 attakGrid.width = attakGrid.nbRow * attakGrid.size;
-
-attakGrid.type = "attack";
 attakGrid.setupIsoGrid();
-attakGrid.hoverFillColor = "red";
-attakGrid.hoverStrokeColor = "black"
 
-const defenseGrid = new IsoGrid(p5);
-defenseGrid.nbCol = 10;
-defenseGrid.nbRow = 10;
-defenseGrid.padding = 8;
-defenseGrid.size = 64 + 32;
+const defenseGrid = new IsoGrid(p5, 'defense');
+defenseGrid.nbCol = nbColRow;
+defenseGrid.nbRow = nbColRow;
+defenseGrid.padding = padding;
+defenseGrid.size = calcHeight;
 defenseGrid.height = defenseGrid.nbCol * defenseGrid.size;
 defenseGrid.width = defenseGrid.nbRow * defenseGrid.size;
 
-defenseGrid.type = "defense";
 const defGridStart = new Vector();
 defGridStart.y = attakGrid.size * attakGrid.nbCol + MIDDLESPACER;
 defenseGrid.setupIsoGrid(defGridStart);
-defenseGrid.hoverFillColor = "blue";
-defenseGrid.hoverStrokeColor = "black"
 
 const Carrier = new Ship("Carrier", 5, defenseGrid);
 Carrier.orientation = "dDown";
@@ -98,37 +102,37 @@ Destroyer.orientation = "dUp";
 Destroyer.gridIndex[0] = 125;
 
 window.setInterval(() => {
-	Carrier.gridIndex[0]-=20;
-	Battleship.gridIndex[0]-=20;
-	Cruiser.gridIndex[0]-=20;
-	Submarine.gridIndex[0]-=20;
-	Destroyer.gridIndex[0]-=20;
+	// Carrier.gridIndex[0]++;
+	// Battleship.gridIndex[0]++;
+	// Cruiser.gridIndex[0]++;
+	// Submarine.gridIndex[0]++;
+	// Destroyer.gridIndex[0]++;
 
-	if(Carrier.gridIndex[0] > 180)
+	if (Carrier.gridIndex[0] > 180)
 		Carrier.gridIndex[0] = 0;
-	if(Carrier.gridIndex[0] < 0)
+	if (Carrier.gridIndex[0] < 0)
 		Carrier.gridIndex[0] = 180;
 
-	if(Battleship.gridIndex[0] > 180)
+	if (Battleship.gridIndex[0] > 180)
 		Battleship.gridIndex[0] = 0;
-	if(Battleship.gridIndex[0] < 0)
+	if (Battleship.gridIndex[0] < 0)
 		Battleship.gridIndex[0] = 180;
-	
-	if(Cruiser.gridIndex[0] > 180)
+
+	if (Cruiser.gridIndex[0] > 180)
 		Cruiser.gridIndex[0] = 0;
-	if(Cruiser.gridIndex[0] < 0)
+	if (Cruiser.gridIndex[0] < 0)
 		Cruiser.gridIndex[0] = 180;
 
-	if(Submarine.gridIndex[0] > 180)
+	if (Submarine.gridIndex[0] > 180)
 		Submarine.gridIndex[0] = 0;
-	if(Submarine.gridIndex[0] < 0)
+	if (Submarine.gridIndex[0] < 0)
 		Submarine.gridIndex[0] = 180;
 
-	if(Destroyer.gridIndex[0] > 180)
+	if (Destroyer.gridIndex[0] > 180)
 		Destroyer.gridIndex[0] = 0;
-	if(Destroyer.gridIndex[0] < 0)
+	if (Destroyer.gridIndex[0] < 0)
 		Destroyer.gridIndex[0] = 180;
-},1000);
+}, 1500);
 
 export {
 	attakGrid,
