@@ -24,7 +24,6 @@ function sketch(p5: P5) {
 
 function gameLoop(p5: P5) {
 	p5.clear();
-	document.getElementById("app").style.cursor = "auto"
 	attakGrid.drawIsoGrid();
 	defenseGrid.drawIsoGrid();
 
@@ -51,8 +50,8 @@ let canvaHeight = window.screen.height - 50;
 const p5 = new P5(sketch);
 
 const attakGrid = new IsoGrid(p5);
-attakGrid.nbCol = 10;
-attakGrid.nbRow = 10;
+attakGrid.nbCol = 2;
+attakGrid.nbRow = 2;
 attakGrid.padding = 8;
 attakGrid.size = 64 + 16;
 attakGrid.height = attakGrid.nbCol * attakGrid.size;
@@ -67,7 +66,7 @@ const defenseGrid = new IsoGrid(p5);
 defenseGrid.nbCol = 10;
 defenseGrid.nbRow = 10;
 defenseGrid.padding = 8;
-defenseGrid.size = 64 + 16;
+defenseGrid.size = 64 + 32;
 defenseGrid.height = defenseGrid.nbCol * defenseGrid.size;
 defenseGrid.width = defenseGrid.nbRow * defenseGrid.size;
 
@@ -80,31 +79,56 @@ defenseGrid.hoverStrokeColor = "black"
 
 const Carrier = new Ship("Carrier", 5, defenseGrid);
 Carrier.orientation = "dDown";
-Carrier.gridStart = 33;
+Carrier.gridIndex[0] = 33;
 
 const Battleship = new Ship("Battleship", 4, defenseGrid);
 Battleship.orientation = "dUp";
-Battleship.gridStart = 34;
+Battleship.gridIndex[0] = 34;
 
 const Cruiser = new Ship("Cruiser", 3, defenseGrid);
 Cruiser.orientation = "side";
-Cruiser.gridStart = 50;
+Cruiser.gridIndex[0] = 50;
 
 const Submarine = new Ship("Submarine", 3, defenseGrid);
 Submarine.orientation = "bottom";
-Submarine.gridStart = 100;
+Submarine.gridIndex[0] = 100;
 
 const Destroyer = new Ship("Destroyer", 2, defenseGrid);
 Destroyer.orientation = "dUp";
-Destroyer.gridStart = 125;
+Destroyer.gridIndex[0] = 125;
 
-// window.setInterval(() => {
-// 	Carrier.gridStart++;
-// 	Battleship.gridStart++;
-// 	Cruiser.gridStart++;
-// 	Submarine.gridStart++;
-// 	Destroyer.gridStart++;
-// },1000);
+window.setInterval(() => {
+	Carrier.gridIndex[0]-=20;
+	Battleship.gridIndex[0]-=20;
+	Cruiser.gridIndex[0]-=20;
+	Submarine.gridIndex[0]-=20;
+	Destroyer.gridIndex[0]-=20;
+
+	if(Carrier.gridIndex[0] > 180)
+		Carrier.gridIndex[0] = 0;
+	if(Carrier.gridIndex[0] < 0)
+		Carrier.gridIndex[0] = 180;
+
+	if(Battleship.gridIndex[0] > 180)
+		Battleship.gridIndex[0] = 0;
+	if(Battleship.gridIndex[0] < 0)
+		Battleship.gridIndex[0] = 180;
+	
+	if(Cruiser.gridIndex[0] > 180)
+		Cruiser.gridIndex[0] = 0;
+	if(Cruiser.gridIndex[0] < 0)
+		Cruiser.gridIndex[0] = 180;
+
+	if(Submarine.gridIndex[0] > 180)
+		Submarine.gridIndex[0] = 0;
+	if(Submarine.gridIndex[0] < 0)
+		Submarine.gridIndex[0] = 180;
+
+	if(Destroyer.gridIndex[0] > 180)
+		Destroyer.gridIndex[0] = 0;
+	if(Destroyer.gridIndex[0] < 0)
+		Destroyer.gridIndex[0] = 180;
+},1000);
 
 export {
 	attakGrid,
