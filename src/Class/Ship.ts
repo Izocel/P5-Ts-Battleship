@@ -1,9 +1,9 @@
 import { Vector } from "p5";
-import p5 from "./app";
-import { GRIDBOXRADIUS, ORIENTATIONS, SHIPCOLORS } from "./constants";
+import p5 from "../app";
 import IsoGrid from "./IsoGrid";
 import MyVect from "./MyVect";
-import { drawRoundedPolygon } from "./utils";
+import { drawRoundedPolygon } from "../Utils/utils";
+import { GRIDBOXRADIUS, ORIENTATIONS, SHIPCOLORS } from "../Constants/constants";
 
 export default class Ship extends MyVect {
     grid: IsoGrid;

@@ -1,8 +1,9 @@
 import P5, { Vector } from "p5";
-import { atkGridColors, defGridColors, shipColors } from "./constants";
+import { atkGridColors, defGridColors, shipColors } from "../Constants/constants";
 import MyVect from "./MyVect";
-import Ship from "./Ship";
-import { getRndInArray } from "./utils";
+import Ship from "../Class/Ship";
+import { getRndInArray } from "../Utils/utils";
+
 
 export default class IsoGrid {
     private p5: P5;

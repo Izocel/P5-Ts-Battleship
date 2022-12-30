@@ -1,6 +1,6 @@
-import p5 from "./app";
-import IsoGrid from "./IsoGrid";
-import MyVect from "./MyVect";
+import p5 from "../app";
+import IsoGrid from "../Class/IsoGrid";
+import MyVect from "../Class/MyVect";
 
 export function getRndInArray(list: any): any {
     return list[Math.floor((Math.random() * list.length))];

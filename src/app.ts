@@ -3,12 +3,12 @@ import "p5/lib/addons/p5.dom";
 import "p5/lib/addons/p5.sound";
 import "./SCSS/styles.scss";
 
-import IsoGrid from "./IsoGrid";
-import Ship from "./Ship";
+import IsoGrid from "./Class/IsoGrid";
+import Ship from "./Class/Ship";
 
-import { getVectsFromMouse } from "./utils";
-import { MIDDLESPACER } from "./constants";
-import MyVect from "./MyVect";
+import { getVectsFromMouse } from "./Utils/utils";
+import { MIDDLESPACER } from "./Constants/constants";
+import MyVect from "./Class/MyVect";
 
 // Creating the sketch itself
 function sketch(p5: P5) {
@@ -47,6 +47,11 @@ function gameLoop(p5: P5) {
 	}
 	else {
 		mouseGrid = getVectsFromMouse(defenseGrid);
+	}
+
+	const selectedAction = true;
+	if(selectedAction && mouseGrid) {
+
 	}
 
 }

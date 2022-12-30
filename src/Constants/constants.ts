@@ -1,4 +1,4 @@
-import p5 from "./app";
+import p5 from "../app";
 
 // Theme //https://fffuel.co/cccolor/
 export const defGridColors = {
