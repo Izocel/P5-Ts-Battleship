@@ -9,6 +9,7 @@ import Ship from "./Class/Ship";
 import { getVectsFromMouse } from "./Utils/utils";
 import { MIDDLESPACER } from "./Constants/constants";
 import MyVect from "./Class/MyVect";
+import GridPaterns from "./Class/GridPaterns";
 
 // Creating the sketch itself
 function sketch(p5: P5) {
@@ -19,15 +20,31 @@ function sketch(p5: P5) {
 
 		// The game loop
 		p5.draw = () => {
+			p5.clear();
 			gameLoop(p5);
 		};
 	}
 }
 
 function gameLoop(p5: P5) {
-	p5.clear();
 	attakGrid.drawIsoGrid();
 	defenseGrid.drawIsoGrid();
+
+	let mouseGrid: MyVect = null;
+	attakGrid.mouseVect = null;
+	defenseGrid.mouseVect = null;
+	if (p5.mouseY <= defenseGrid.points[0].y) {
+		mouseGrid = getVectsFromMouse(attakGrid);
+	}
+	else {
+		mouseGrid = getVectsFromMouse(defenseGrid);
+	}
+
+	const selectedAction = true;
+	if (selectedAction) {
+		attakGrid.fillGridIndexes(patternsList[pIndex])
+	}
+
 
 	Carrier.draw();
 	Battleship.draw();
@@ -37,23 +54,6 @@ function gameLoop(p5: P5) {
 
 	attakGrid.drawGridPin()
 	defenseGrid.drawGridPin()
-
-	attakGrid.mouseVect = null;
-	defenseGrid.mouseVect = null;
-
-	let mouseGrid: MyVect = null;
-	if (p5.mouseY <= defenseGrid.points[0].y) {
-		mouseGrid = getVectsFromMouse(attakGrid);
-	}
-	else {
-		mouseGrid = getVectsFromMouse(defenseGrid);
-	}
-
-	const selectedAction = true;
-	if(selectedAction && mouseGrid) {
-
-	}
-
 }
 
 //Game Init
@@ -106,12 +106,17 @@ const Destroyer = new Ship("Destroyer", 2, defenseGrid);
 Destroyer.orientation = "dUp";
 Destroyer.gridIndex[0] = 125;
 
+let pIndex = 0;
 window.setInterval(() => {
 	// Carrier.gridIndex[0]++;
 	// Battleship.gridIndex[0]++;
 	// Cruiser.gridIndex[0]++;
 	// Submarine.gridIndex[0]++;
 	// Destroyer.gridIndex[0]++;
+
+	pIndex++;
+	if (pIndex > patternsList.length - 1)
+		pIndex = 0;
 
 	if (Carrier.gridIndex[0] > 180)
 		Carrier.gridIndex[0] = 0;
@@ -137,14 +142,31 @@ window.setInterval(() => {
 		Destroyer.gridIndex[0] = 0;
 	if (Destroyer.gridIndex[0] < 0)
 		Destroyer.gridIndex[0] = 180;
-}, 1500);
+}, 750);
 
 export {
 	attakGrid,
 	defenseGrid
 };
 
+
+const gridPaterns = new GridPaterns(p5, attakGrid);
+const patternsList = [
+	gridPaterns.getLine(1, 80),
+	gridPaterns.getLine(2, 80),
+	gridPaterns.getLine(3, 80),
+	gridPaterns.getLine(5, 80),
+	gridPaterns.getLine(6, 80),
+
+	gridPaterns.getSquare(1, 80),
+	gridPaterns.getSquare(2, 80),
+	gridPaterns.getSquare(3, 80),
+	gridPaterns.getSquare(5, 80),
+	gridPaterns.getSquare(6, 80),
+];
+
 console.log(attakGrid)
 console.log(defenseGrid)
+console.log(gridPaterns);
 
 export default p5;

@@ -111,6 +111,29 @@ export default class IsoGrid {
         });
     }
 
+    fillGridIndexes(idx:number[], colors = {fill:"white", stroke:"black"}) {
+        idx.forEach(i => {
+            const p = this.points[i];
+            p.isMouseHover = this.mouseVect == p;
+            const fill = p.isMouseHover ? this.colors.hoverGridFill : colors.fill;
+            const stroke = p.isMouseHover ? this.colors.hoverGridStroke : colors.stroke;
+            this.p5.stroke(stroke);
+            this.p5.fill(fill);
+
+            this.p5.beginShape();
+            this.p5.vertex(p.x - this.size / 2, p.y);
+            this.p5.vertex(p.x, p.y - this.size / 2);
+            this.p5.vertex(p.x + this.size / 2, p.y);
+            this.p5.vertex(p.x, p.y + this.size / 2);
+            this.p5.endShape(this.p5.CLOSE);
+        });
+
+        // Extras
+
+        this.p5.noFill();
+        this.p5.noStroke();
+    }
+
     drawIsoGrid() {
         this.points.forEach((p: MyVect, i) => {
             p.isMouseHover = this.mouseVect == p;

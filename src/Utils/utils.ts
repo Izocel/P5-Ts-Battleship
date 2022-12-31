@@ -72,14 +72,14 @@ export function getVectsFromMouse(grid: IsoGrid): MyVect {
     mouseVect.x = Math.floor(p5.mouseX);
     mouseVect.y = Math.floor(p5.mouseY);
 
-    const offset = 40;
+    const offset = 50;
     let vects = grid.points.filter(v => {
         return v.x - offset <= mouseVect.x && v.x + offset >= mouseVect.x
             && v.y - offset <= mouseVect.y && v.y + offset >= mouseVect.y
     });
 
     let found = null;
-    if (vects.length >= 0 && vects.length < 10) {
+    if (vects.length >= 0 && vects.length < 8) {
         let minX = Number.MAX_SAFE_INTEGER;
         const deltas = [];
 

@@ -1,5 +1,0 @@
-class GridPatern {
-    constructor(parameters) {
-        
-    }
-}
