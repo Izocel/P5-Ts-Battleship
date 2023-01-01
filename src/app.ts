@@ -31,18 +31,24 @@ function gameLoop(p5: P5) {
 	defenseGrid.drawIsoGrid();
 
 	let mouseGrid: MyVect = null;
+	let mouseGridIdx: number = null;
 	attakGrid.mouseVect = null;
 	defenseGrid.mouseVect = null;
 	if (p5.mouseY <= defenseGrid.points[0].y) {
 		mouseGrid = getVectsFromMouse(attakGrid);
+		mouseGridIdx = attakGrid.points.findIndex(v => v == mouseGrid);
 	}
 	else {
 		mouseGrid = getVectsFromMouse(defenseGrid);
+		mouseGridIdx = attakGrid.points.findIndex(v => v == mouseGrid);
 	}
 
 	const selectedAction = true;
-	if (selectedAction) {
-		attakGrid.fillGridIndexes(patternsList[pIndex])
+	if (selectedAction && mouseGridIdx > 0) {
+		const selectors = gridPaterns.getCross(3, mouseGridIdx);
+
+		if (gridPaterns.areInGrid(selectors))
+			attakGrid.fillGridIndexes(selectors)
 	}
 
 
@@ -114,10 +120,6 @@ window.setInterval(() => {
 	// Submarine.gridIndex[0]++;
 	// Destroyer.gridIndex[0]++;
 
-	pIndex++;
-	if (pIndex > patternsList.length - 1)
-		pIndex = 0;
-
 	if (Carrier.gridIndex[0] > 180)
 		Carrier.gridIndex[0] = 0;
 	if (Carrier.gridIndex[0] < 0)
@@ -151,25 +153,16 @@ export {
 
 
 const gridPaterns = new GridPaterns(p5, attakGrid);
-const patternsList = [
-	gridPaterns.getLine(1, 80),
-	gridPaterns.getLine(2, 80),
-	gridPaterns.getLine(3, 80),
-	gridPaterns.getLine(5, 80),
-	gridPaterns.getLine(6, 80),
+const patternsList = {
+	line1: gridPaterns.getLine(1, 80),
+	line2: gridPaterns.getLine(2, 80),
+	line3: gridPaterns.getLine(3, 80),
 
-	gridPaterns.getSquare(1, 80),
-	gridPaterns.getSquare(2, 80),
-	gridPaterns.getSquare(3, 80),
-	gridPaterns.getSquare(5, 80),
-	gridPaterns.getSquare(6, 80),
+	sqr2: gridPaterns.getSquare(2, 80),
+	sqr3: gridPaterns.getSquare(3, 80),
 
-	gridPaterns.getCross(1, 80),
-	gridPaterns.getCross(2, 80),
-	gridPaterns.getCross(3, 80),
-	gridPaterns.getCross(5, 80),
-	gridPaterns.getCross(6, 80),
-];
+	cross3: gridPaterns.getCross(3, 80),
+};
 
 console.log(attakGrid)
 console.log(defenseGrid)

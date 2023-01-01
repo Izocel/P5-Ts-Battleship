@@ -79,4 +79,13 @@ export default class GridPaterns {
         return gridOutputs;
     }
 
+    areInGrid(idxArray: number[]): boolean {
+        const first = idxArray[0];
+        const last = idxArray[idxArray.length - 1];
+        const gridBound = this.gridCtx.points.length;
+
+        return first > 0 && first < gridBound
+            && last > 0 && last < gridBound;
+    }
+
 }
