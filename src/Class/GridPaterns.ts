@@ -34,19 +34,30 @@ export default class GridPaterns {
         return gridOutputs;
     }
 
-    //TODO: 
-    // getCross(n:number, si:number) {
-    //     if (n === 1) {
-    //         console.log("Cross n: " + n);
-    //         console.log([si]);
-    //         return [si];
-    //     }
+    getCross(n: number, si: number) {
+        if (n === 1) {
+            return [si];
+        }
 
-    //     const indexDelta: number = 1;
-    //     const gridOutputs: number[] = [];
+        const indexDelta: number = this.gridCtx.nbCol;
+        const gridOutputs: number[] = [];
 
-    //     return gridOutputs;
-    // }
+        const divider = Math.floor(n / 2);
+        let start = si - indexDelta * divider;
+        for (let i = 0; i < n; i++) {
+            const idx = indexDelta * i + start;
+            gridOutputs.push(idx)
+        }
+
+        start = si - indexDelta * divider + divider;
+        for (let i = 0; i < n; i++) {
+            const idx = start + (indexDelta * i) - i;
+            gridOutputs.push(idx)
+        }
+
+        gridOutputs.sort(function (a, b) { return a - b });
+        return gridOutputs;
+    }
 
     getSquare(n: number, si: number) {
         if (n === 1)

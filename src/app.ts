@@ -163,6 +163,12 @@ const patternsList = [
 	gridPaterns.getSquare(3, 80),
 	gridPaterns.getSquare(5, 80),
 	gridPaterns.getSquare(6, 80),
+
+	gridPaterns.getCross(1, 80),
+	gridPaterns.getCross(2, 80),
+	gridPaterns.getCross(3, 80),
+	gridPaterns.getCross(5, 80),
+	gridPaterns.getCross(6, 80),
 ];
 
 console.log(attakGrid)
