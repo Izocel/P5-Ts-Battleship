@@ -14,7 +14,7 @@ import GridPaterns from "./Class/GridPaterns";
 // Creating the sketch itself
 function sketch(p5: P5) {
 	p5.setup = () => {
-		const cnv = p5.createCanvas(canvaWidth * 2, canvaHeight * 2);
+		const cnv = p5.createCanvas(canvaWidth, canvaHeight);
 		cnv.style('display', 'block');
 		cnv.parent('app');
 
@@ -62,19 +62,21 @@ function gameLoop(p5: P5) {
 	defenseGrid.drawGridPin()
 }
 
-//Game Init
-let canvaWidth = window.screen.width;
-let canvaHeight = window.screen.height;
+// Game Init
+const nbColRow = 10;
+let canvaWidth = Math.floor(window.screen.width);
+let canvaHeight = Math.floor(window.screen.height);
+let calcHeight = Math.floor(canvaHeight / (nbColRow * 3));
+
 const p5 = new P5(sketch);
 
-const nbColRow = 10;
-const padding = 8;
-let calcHeight = 64 + 32;
+// Player Init
+let selectedAtkmode = "attack";
 
+// Grids Init
 const attakGrid = new IsoGrid(p5, 'attack');
 attakGrid.nbCol = nbColRow;
 attakGrid.nbRow = nbColRow;
-attakGrid.padding = padding;
 attakGrid.size = calcHeight;
 attakGrid.height = attakGrid.nbCol * attakGrid.size;
 attakGrid.width = attakGrid.nbRow * attakGrid.size;
@@ -83,7 +85,6 @@ attakGrid.setupIsoGrid();
 const defenseGrid = new IsoGrid(p5, 'defense');
 defenseGrid.nbCol = nbColRow;
 defenseGrid.nbRow = nbColRow;
-defenseGrid.padding = padding;
 defenseGrid.size = calcHeight;
 defenseGrid.height = defenseGrid.nbCol * defenseGrid.size;
 defenseGrid.width = defenseGrid.nbRow * defenseGrid.size;

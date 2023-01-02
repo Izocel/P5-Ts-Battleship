@@ -35,8 +35,17 @@ export default class IsoGrid {
             Submarine: null,
             Destroyer: null
         }
+        
         this.type = type;
         this.colors = this.type === "attack" ? atkGridColors : defGridColors;
+    }
+
+    getPadding() {
+        if(!this.padding) {
+            this.padding = this.size * 0.1;
+        }
+
+        return this.padding;
     }
 
     setupIsoGrid(start: Vector = new Vector()): MyVect[] {
@@ -84,12 +93,14 @@ export default class IsoGrid {
 
             if (showPin) {
                 this.p5.fill('white');
-                this.p5.ellipse(p.x, p.y, 16, 16);
+                this.p5.ellipse(p.x, p.y, this.size/6, this.size/6);
             }
 
             if (showIndex) {
-                this.p5.fill(0, 0, 0);
-                this.p5.text(i, p.x - 6, p.y + 20);
+                this.p5.fill("black");
+                this.p5.stroke("black");
+                this.p5.textSize(this.size/6)
+                this.p5.text(i, p.x - this.size/8, p.y + this.size/4);
             }
         });
 

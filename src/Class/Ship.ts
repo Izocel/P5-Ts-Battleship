@@ -159,31 +159,31 @@ export default class Ship extends MyVect {
 
         const quad: Vector[] = [];
         if (this.orientation == "dDown") {
-            quad.push(p5.createVector(p.x, p.y - this.grid.size / 2 + this.grid.padding));
-            quad.push(p5.createVector(pEnd.x + this.grid.size / 2 - this.grid.padding, pEnd.y));
+            quad.push(p5.createVector(p.x, p.y - this.grid.size / 2 + this.grid.getPadding()));
+            quad.push(p5.createVector(pEnd.x + this.grid.size / 2 - this.grid.getPadding(), pEnd.y));
 
-            quad.push(p5.createVector(pEnd.x, pEnd.y + this.grid.size / 2 - this.grid.padding));
-            quad.push(p5.createVector(p.x - this.grid.size / 2 + this.grid.padding, p.y));
+            quad.push(p5.createVector(pEnd.x, pEnd.y + this.grid.size / 2 - this.grid.getPadding()));
+            quad.push(p5.createVector(p.x - this.grid.size / 2 + this.grid.getPadding(), p.y));
         }
         else if (this.orientation == "dUp") {
-            quad.push(p5.createVector(p.x - this.grid.size / 2 + this.grid.padding, p.y));
-            quad.push(p5.createVector(pEnd.x, pEnd.y - this.grid.size / 2 + this.grid.padding));
-            quad.push(p5.createVector(pEnd.x + this.grid.size / 2 - this.grid.padding, pEnd.y));
-            quad.push(p5.createVector(p.x, p.y + this.grid.size / 2 - this.grid.padding));
+            quad.push(p5.createVector(p.x - this.grid.size / 2 + this.grid.getPadding(), p.y));
+            quad.push(p5.createVector(pEnd.x, pEnd.y - this.grid.size / 2 + this.grid.getPadding()));
+            quad.push(p5.createVector(pEnd.x + this.grid.size / 2 - this.grid.getPadding(), pEnd.y));
+            quad.push(p5.createVector(p.x, p.y + this.grid.size / 2 - this.grid.getPadding()));
         }
         else if (this.orientation == "side") {
             const long = this.grid.size * (this.maxHp - 1);
-            quad.push(p5.createVector(p.x - this.grid.padding * 1.5, p.y - this.grid.size / 4 - this.grid.padding));
-            quad.push(p5.createVector(p.x + long + this.grid.padding * 2, p.y - this.grid.size / 4 - this.grid.padding));
-            quad.push(p5.createVector(p.x + long + this.grid.padding * 2, p.y + this.grid.size / 4 + this.grid.padding / 2));
-            quad.push(p5.createVector(p.x - this.grid.padding * 1.5, p.y + this.grid.size / 4 + this.grid.padding / 2));
+            quad.push(p5.createVector(p.x - this.grid.getPadding() * 1.5, p.y - this.grid.size / 4 - this.grid.getPadding()));
+            quad.push(p5.createVector(p.x + long + this.grid.getPadding() * 2, p.y - this.grid.size / 4 - this.grid.getPadding()));
+            quad.push(p5.createVector(p.x + long + this.grid.getPadding() * 2, p.y + this.grid.size / 4 + this.grid.getPadding() / 2));
+            quad.push(p5.createVector(p.x - this.grid.getPadding() * 1.5, p.y + this.grid.size / 4 + this.grid.getPadding() / 2));
         }
         else if (this.orientation == "bottom") {
             const long = this.grid.size * (this.maxHp - 1);
-            quad.push(p5.createVector(p.x + this.grid.size / 2 - this.grid.padding * 2, p.y - this.grid.size / 4 + this.grid.padding));
-            quad.push(p5.createVector(p.x - this.grid.size / 2 + this.grid.padding * 2, p.y - this.grid.size / 4 + this.grid.padding));
-            quad.push(p5.createVector(p.x - this.grid.size / 2 + this.grid.padding * 2, p.y + long + this.grid.padding * 1.5));
-            quad.push(p5.createVector(p.x + this.grid.size / 2 - this.grid.padding * 2, p.y + long + this.grid.padding * 1.5));
+            quad.push(p5.createVector(p.x + this.grid.size / 2 - this.grid.getPadding() * 2, p.y - this.grid.size / 4 + this.grid.getPadding()));
+            quad.push(p5.createVector(p.x - this.grid.size / 2 + this.grid.getPadding() * 2, p.y - this.grid.size / 4 + this.grid.getPadding()));
+            quad.push(p5.createVector(p.x - this.grid.size / 2 + this.grid.getPadding() * 2, p.y + long + this.grid.getPadding() * 1.5));
+            quad.push(p5.createVector(p.x + this.grid.size / 2 - this.grid.getPadding() * 2, p.y + long + this.grid.getPadding() * 1.5));
         }
 
         this.colors.fill();
