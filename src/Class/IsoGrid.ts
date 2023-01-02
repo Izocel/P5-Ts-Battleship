@@ -59,6 +59,7 @@ export default class IsoGrid {
                 p.orientation = getRndInArray(["dUp", "dDown"]);
                 p.fillColor = this.colors.gridFill;
                 p.strokeColor = this.colors.gridStroke;
+                p.pinColor = "white";
                 if (firstInRow) {
                     //first point in a row cannot be dUp oriented
                     firstInRow = false;
@@ -85,18 +86,26 @@ export default class IsoGrid {
         return this.showPin;
     }
 
-    drawGridPin(vects: MyVect[] = this.points, showIndex: boolean = this.showIndex, showPin: boolean = this.showPin) {
+    setGridPin(vects: MyVect[] = this.points, showIndex: boolean = this.showIndex, showPin: boolean = this.showPin) {
+        if (!vects?.length) { return; }
+        
+        vects.forEach(p => {
+            p.showIndex = showIndex;
+            p.showPin = showPin;
+        });
+    }
+
+    drawGridPin(vects: MyVect[] = this.points) {
         if (!vects?.length) { return; }
 
         this.p5.stroke(this.colors.hoverGridStroke);
         vects.forEach((p, i) => {
-
-            if (showPin) {
-                this.p5.fill('white');
+            if (p.showPin) {
+                this.p5.fill(p.pinColor);
                 this.p5.ellipse(p.x, p.y, this.size/6, this.size/6);
             }
 
-            if (showIndex) {
+            if (p.showIndex) {
                 this.p5.fill("black");
                 this.p5.stroke("black");
                 this.p5.textSize(this.size/6)

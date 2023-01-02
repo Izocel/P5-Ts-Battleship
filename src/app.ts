@@ -27,6 +27,7 @@ function sketch(p5: P5) {
 }
 
 function gameLoop(p5: P5) {
+	p5.mousePressed = null;
 	attakGrid.drawIsoGrid();
 	defenseGrid.drawIsoGrid();
 
@@ -44,11 +45,12 @@ function gameLoop(p5: P5) {
 	}
 
 	const selectedAction = true;
+	let atkSelectors = null;
 	if (selectedAction && mouseGridIdx > 0) {
-		const selectors = gridPaterns.getCross(3, mouseGridIdx);
+		atkSelectors = gridPaterns.getCross(3, mouseGridIdx);
 
-		if (gridPaterns.areInGrid(selectors))
-			attakGrid.fillGridIndexes(selectors)
+		if (gridPaterns.areInGrid(atkSelectors))
+			attakGrid.fillGridIndexes(atkSelectors)
 	}
 
 
@@ -58,8 +60,15 @@ function gameLoop(p5: P5) {
 	Submarine.draw();
 	Destroyer.draw();
 
-	attakGrid.drawGridPin()
-	defenseGrid.drawGridPin()
+	attakGrid.setGridPin();
+	defenseGrid.setGridPin();
+
+	if(atkSelectors) {
+		p5.mousePressed = (e) => onClickAttack(e,atkSelectors);
+	}
+
+	attakGrid.drawGridPin();
+	defenseGrid.drawGridPin();
 }
 
 // Game Init
@@ -71,7 +80,27 @@ let calcHeight = Math.floor(canvaHeight / (nbColRow * 3));
 const p5 = new P5(sketch);
 
 // Player Init
-let selectedAtkmode = "attack";
+let selectedAtkMode = "attack";
+
+function onClickAttack(e: object, mouseAtkGrids:number[]) {
+	console.log(e)
+	mouseAtkGrids.forEach(idx => {
+		const point = attakGrid.points[idx];
+
+		if(point) {
+			point.pinColor = "green";
+		}
+	});
+	return attakGrid
+}
+
+function setAttackVectors(e:Event, mode:string) {
+	selectedAtkMode = mode;
+}
+
+function fireAtAtkVectors(e:Event) {
+	
+}
 
 // Grids Init
 const attakGrid = new IsoGrid(p5, 'attack');
