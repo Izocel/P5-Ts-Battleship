@@ -29,6 +29,7 @@ export default class Ship extends MyVect {
 
     setSprite(sprite: Sprite): Sprite {
         this.sprite = sprite;
+        this.grid.ships[this.name].sprite = this.sprite;
         return this.sprite;
     }
 
@@ -179,6 +180,8 @@ export default class Ship extends MyVect {
         const pEnd = this.grid.points[gridEnd];
         if (!pEnd) { return; }
 
+        let pFrame: Vector;
+
         const quad: Vector[] = [];
         if (this.orientation == "dDown") {
             quad.push(p5.createVector(p.x, p.y - this.grid.size / 2 + this.grid.getPadding()));
@@ -186,12 +189,18 @@ export default class Ship extends MyVect {
 
             quad.push(p5.createVector(pEnd.x, pEnd.y + this.grid.size / 2 - this.grid.getPadding()));
             quad.push(p5.createVector(p.x - this.grid.size / 2 + this.grid.getPadding(), p.y));
+            pFrame = quad[1].copy();
+            pFrame.x += this.grid.getPadding() * 2;
+            pFrame.y -= this.grid.getPadding() * 2;
         }
         else if (this.orientation == "dUp") {
             quad.push(p5.createVector(p.x - this.grid.size / 2 + this.grid.getPadding(), p.y));
             quad.push(p5.createVector(pEnd.x, pEnd.y - this.grid.size / 2 + this.grid.getPadding()));
             quad.push(p5.createVector(pEnd.x + this.grid.size / 2 - this.grid.getPadding(), pEnd.y));
             quad.push(p5.createVector(p.x, p.y + this.grid.size / 2 - this.grid.getPadding()));
+            pFrame = quad[1].copy();
+            pFrame.x -= this.grid.getPadding();
+            pFrame.y -= this.grid.getPadding() * 2;
         }
         else if (this.orientation == "side") {
             const long = this.grid.size * (this.maxHp - 1);
@@ -199,6 +208,9 @@ export default class Ship extends MyVect {
             quad.push(p5.createVector(p.x + long + this.grid.getPadding() * 2, p.y - this.grid.size / 4 - this.grid.getPadding()));
             quad.push(p5.createVector(p.x + long + this.grid.getPadding() * 2, p.y + this.grid.size / 4 + this.grid.getPadding() / 2));
             quad.push(p5.createVector(p.x - this.grid.getPadding() * 1.5, p.y + this.grid.size / 4 + this.grid.getPadding() / 2));
+            pFrame = quad[1].copy();
+            pFrame.x += this.grid.getPadding() * 2;
+            pFrame.y -= this.grid.getPadding();
         }
         else if (this.orientation == "bottom") {
             const long = this.grid.size * (this.maxHp - 1);
@@ -206,15 +218,29 @@ export default class Ship extends MyVect {
             quad.push(p5.createVector(p.x - this.grid.size / 2 + this.grid.getPadding() * 2, p.y - this.grid.size / 4 + this.grid.getPadding()));
             quad.push(p5.createVector(p.x - this.grid.size / 2 + this.grid.getPadding() * 2, p.y + long + this.grid.getPadding() * 1.5));
             quad.push(p5.createVector(p.x + this.grid.size / 2 - this.grid.getPadding() * 2, p.y + long + this.grid.getPadding() * 1.5));
+            pFrame = quad[3].copy();
+            pFrame.x += this.grid.getPadding() * 2;
+            pFrame.y += this.grid.getPadding();
         }
 
-        this.colors.fill();
-        this.colors.stroke();
-        drawRoundedPolygon(quad, GRIDBOXRADIUS);
+        //TODO: view selector (grid)
+        // this.colors.fill();
+        // this.colors.stroke();
+        // drawRoundedPolygon(quad, GRIDBOXRADIUS);
 
         if (quad.length === 4 && this.sprite) {
-            this.sprite.resize(this.grid.size - (this.grid.getPadding() / 2), this.grid.size * (this.maxHp) - this.grid.size / 2)
-            this.sprite.moveToVect(pEnd)
+            let width = this.grid.size - (this.grid.getPadding());
+            let height = this.grid.size * (this.maxHp) - this.grid.size;
+
+            if (this.maxHp <= 3)
+                height += this.grid.size * 0.5;
+            else if (this.maxHp === 4)
+                height -= this.grid.size * 0.33;
+            else if (this.maxHp === 5)
+                height -= this.grid.size * 0.55;
+
+            this.sprite.resize(width, height)
+            this.sprite.moveToVect(pFrame)
             this.sprite.setAngle(this.getAngle());
             this.sprite.show();
         }

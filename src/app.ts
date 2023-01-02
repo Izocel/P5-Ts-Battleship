@@ -20,10 +20,15 @@ let shipsJsonData: object | any[];
 let gameConsole: GameConsole = null;
 
 let Carrier: Ship,
+	CarrierAtk: Ship,
 	Battleship: Ship,
+	BattleshipAtk: Ship,
 	Cruiser: Ship,
+	CruiserAtk: Ship,
 	Submarine: Ship,
-	Destroyer: Ship;
+	SubmarineAtk: Ship,
+	Destroyer: Ship,
+	DestroyerAtk: Ship;
 
 
 
@@ -46,21 +51,41 @@ function sketch(p5: P5) {
 		Carrier.orientation = "dDown";
 		Carrier.gridIndex[0] = 33;
 
+		CarrierAtk = new Ship("Carrier", 5, attakGrid);
+		CarrierAtk.orientation = "dDown";
+		CarrierAtk.gridIndex[0] = 33;
+
 		Battleship = new Ship("Battleship", 4, defenseGrid);
 		Battleship.orientation = "dUp";
 		Battleship.gridIndex[0] = 34;
+
+		BattleshipAtk = new Ship("Battleship", 4, attakGrid);
+		BattleshipAtk.orientation = "dUp";
+		BattleshipAtk.gridIndex[0] = 34;
 
 		Cruiser = new Ship("Cruiser", 3, defenseGrid);
 		Cruiser.orientation = "side";
 		Cruiser.gridIndex[0] = 50;
 
+		CruiserAtk = new Ship("Cruiser", 3, attakGrid);
+		CruiserAtk.orientation = "side";
+		CruiserAtk.gridIndex[0] = 50;
+
 		Submarine = new Ship("Submarine", 3, defenseGrid);
 		Submarine.orientation = "bottom";
 		Submarine.gridIndex[0] = 100;
 
+		SubmarineAtk = new Ship("Submarine", 3, attakGrid);
+		SubmarineAtk.orientation = "bottom";
+		SubmarineAtk.gridIndex[0] = 100;
+
 		Destroyer = new Ship("Destroyer", 2, defenseGrid);
 		Destroyer.orientation = "dUp";
 		Destroyer.gridIndex[0] = 125;
+
+		DestroyerAtk = new Ship("Destroyer", 2, attakGrid);
+		DestroyerAtk.orientation = "dUp";
+		DestroyerAtk.gridIndex[0] = 125;
 	}
 
 	p5.setup = () => {
@@ -72,19 +97,23 @@ function sketch(p5: P5) {
 
 		const bA: Sprite = new Sprite().withSpriteJson(shipsData, shipsSprites, 0, 0);
 		Carrier.setSprite(bA);
+		CarrierAtk.setSprite(bA);
 
 		const bB: Sprite = new Sprite().withSpriteJson(shipsData, shipsSprites, 1, 1);
 		Battleship.setSprite(bB);
+		BattleshipAtk.setSprite(bB);
 
 		const bC: Sprite = new Sprite().withSpriteJson(shipsData, shipsSprites, 2, 2);
 		Cruiser.setSprite(bC);
+		CruiserAtk.setSprite(bC);
 
 		const bD: Sprite = new Sprite().withSpriteJson(shipsData, shipsSprites, 3, 3);
 		Submarine.setSprite(bD);
+		SubmarineAtk.setSprite(bD);
 
 		const bE: Sprite = new Sprite().withSpriteJson(shipsData, shipsSprites, 4, 4);
 		Destroyer.setSprite(bE);
-
+		DestroyerAtk.setSprite(bE);
 
 		// The game loop
 		p5.draw = () => {
@@ -121,12 +150,16 @@ function gameLoop(p5: P5) {
 			attakGrid.fillGridIndexes(atkSelectors)
 	}
 
+	//TODO: Grid method
+	Object.entries(defenseGrid.ships).forEach(s => {
+		const ship: Ship = s[1];
+		ship.draw();
+	});
 
-	Carrier.draw();
-	Battleship.draw();
-	Cruiser.draw();
-	Submarine.draw();
-	Destroyer.draw();
+	Object.entries(attakGrid.ships).forEach(s => {
+		const ship: Ship = s[1];
+		ship?.draw();
+	});
 
 	attakGrid.setGridPin();
 	defenseGrid.setGridPin();
