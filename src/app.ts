@@ -63,8 +63,8 @@ function gameLoop(p5: P5) {
 	attakGrid.setGridPin();
 	defenseGrid.setGridPin();
 
-	if(atkSelectors) {
-		p5.mousePressed = (e) => onClickAttack(e,atkSelectors);
+	if (atkSelectors) {
+		p5.mousePressed = (e) => onClickAttack(e, atkSelectors);
 	}
 
 	attakGrid.drawGridPin();
@@ -82,24 +82,24 @@ const p5 = new P5(sketch);
 // Player Init
 let selectedAtkMode = "attack";
 
-function onClickAttack(e: object, mouseAtkGrids:number[]) {
+function onClickAttack(e: object, mouseAtkGrids: number[]) {
 	console.log(e)
 	mouseAtkGrids.forEach(idx => {
 		const point = attakGrid.points[idx];
 
-		if(point) {
+		if (point) {
 			point.pinColor = "green";
 		}
 	});
 	return attakGrid
 }
 
-function setAttackVectors(e:Event, mode:string) {
+function setAttackVectors(e: Event, mode: string) {
 	selectedAtkMode = mode;
 }
 
-function fireAtAtkVectors(e:Event) {
-	
+function fireAtAtkVectors(e: Event) {
+
 }
 
 // Grids Init
@@ -199,3 +199,61 @@ console.log(defenseGrid)
 console.log(gridPaterns);
 
 export default p5;
+
+
+$(function () {
+
+	var gameConsole = (function () {
+		var following = true,
+			pre = document.createElement('pre'),
+			code = document.createElement('code');
+
+		pre.appendChild(code);
+		pre.classList.add("scrollbar");
+		document.getElementById("gameConsole").appendChild(pre);
+
+		return {
+			follow: follow,
+			log: print.bind(this, 'log'),
+			succes: print.bind(this, 'succes'),
+			warn: print.bind(this, 'warn'),
+			danger: print.bind(this, 'danger')
+		};
+
+		function clear() {
+			while (code.hasChildNodes()) {
+				code.removeChild(code.lastChild);
+			}
+		}
+
+		function follow() {
+			following = true;
+		}
+
+		function print(className, object) {
+			const playername = "Username";
+			const now = new Date().toLocaleTimeString();
+			var s = (typeof object === 'string')
+				? `[${now}] ${playername}: ${object}`
+				: `[${now}] ${playername}-: ${JSON.stringify(object)}`,
+
+				span = document.createElement('span'),
+				text = document.createTextNode(s + '\n');
+
+			span.setAttribute('class', className);
+			span.appendChild(text);
+			code.appendChild(span);
+
+			if (following) {
+				scrollToBottom();
+			}
+		}
+
+		function scrollToBottom() {
+			document.getElementById("gameConsole").querySelector("pre")
+				.scrollTo(0, Number.MAX_SAFE_INTEGER);
+		}
+	}());
+});
+
+
