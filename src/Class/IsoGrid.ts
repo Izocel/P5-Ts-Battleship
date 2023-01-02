@@ -1,4 +1,5 @@
-import P5, { Vector } from "p5";
+import { Vector } from "p5";
+import p5 from "../app";
 import { atkGridColors, defGridColors, shipColors } from "../Constants/constants";
 import MyVect from "./MyVect";
 import Ship from "../Class/Ship";
@@ -6,7 +7,6 @@ import { getRndInArray } from "../Utils/utils";
 
 
 export default class IsoGrid {
-    private p5: P5;
     public height: number;
     public width: number;
     public nbCol: number;
@@ -25,8 +25,7 @@ export default class IsoGrid {
     public showIndex: boolean = true;
     public showPin: boolean = true;
 
-    constructor(p5: P5, type: string) {
-        this.p5 = p5;
+    constructor(type: string) {
         this.points = [];
         this.ships = {
             Carrier: null,
@@ -35,21 +34,21 @@ export default class IsoGrid {
             Submarine: null,
             Destroyer: null
         }
-        
+
         this.type = type;
         this.colors = this.type === "attack" ? atkGridColors : defGridColors;
     }
 
     getPadding() {
-        if(!this.padding) {
+        if (!this.padding) {
             this.padding = this.size * 0.1;
         }
 
         return this.padding;
     }
 
-    getAllShipIndexes():number[] {
-        let outputs:number[] = [];
+    getAllShipIndexes(): number[] {
+        let outputs: number[] = [];
         Object.entries(this.ships).forEach(s => {
             const ship: Ship = s[1];
 
@@ -61,7 +60,7 @@ export default class IsoGrid {
         return outputs;
     }
 
-    shipAtIndex(idx:number) {
+    shipAtIndex(idx: number) {
         return this.getAllShipIndexes().includes(idx);
     }
 
@@ -71,7 +70,7 @@ export default class IsoGrid {
             let firstInRow = true;
 
             for (; x < this.width; x += this.size) {
-                let p: MyVect = this.p5.createVector(x, y + start.y, 1);
+                let p: MyVect = p5.createVector(x, y + start.y, 1);
 
                 p.orientation = getRndInArray(["dUp", "dDown"]);
                 p.fillColor = this.colors.gridFill;
@@ -105,7 +104,7 @@ export default class IsoGrid {
 
     setGridPin(vects: MyVect[] = this.points, showIndex: boolean = this.showIndex, showPin: boolean = this.showPin) {
         if (!vects?.length) { return; }
-        
+
         vects.forEach(p => {
             p.showIndex = showIndex;
             p.showPin = showPin;
@@ -115,23 +114,23 @@ export default class IsoGrid {
     drawGridPin(vects: MyVect[] = this.points) {
         if (!vects?.length) { return; }
 
-        this.p5.stroke(this.colors.hoverGridStroke);
+        p5.stroke(this.colors.hoverGridStroke);
         vects.forEach((p, i) => {
             if (p.showPin) {
-                this.p5.fill(p.pinColor);
-                this.p5.ellipse(p.x, p.y, this.size/6, this.size/6);
+                p5.fill(p.pinColor);
+                p5.ellipse(p.x, p.y, this.size / 6, this.size / 6);
             }
 
             if (p.showIndex) {
-                this.p5.fill("black");
-                this.p5.stroke("black");
-                this.p5.textSize(this.size/6)
-                this.p5.text(i, p.x - this.size/8, p.y + this.size/4);
+                p5.fill("black");
+                p5.stroke("black");
+                p5.textSize(this.size / 6)
+                p5.text(i, p.x - this.size / 8, p.y + this.size / 4);
             }
         });
 
-        this.p5.noFill();
-        this.p5.noStroke();
+        p5.noFill();
+        p5.noStroke();
     }
 
     colorShipGrid() {
@@ -148,27 +147,27 @@ export default class IsoGrid {
         });
     }
 
-    fillGridIndexes(idx:number[], colors = {fill:"white", stroke:"black"}) {
+    fillGridIndexes(idx: number[], colors = { fill: "white", stroke: "black" }) {
         idx.forEach(i => {
             const p = this.points[i];
             p.isMouseHover = this.mouseVect == p;
             const fill = p.isMouseHover ? this.colors.hoverGridFill : colors.fill;
             const stroke = p.isMouseHover ? this.colors.hoverGridStroke : colors.stroke;
-            this.p5.stroke(stroke);
-            this.p5.fill(fill);
+            p5.stroke(stroke);
+            p5.fill(fill);
 
-            this.p5.beginShape();
-            this.p5.vertex(p.x - this.size / 2, p.y);
-            this.p5.vertex(p.x, p.y - this.size / 2);
-            this.p5.vertex(p.x + this.size / 2, p.y);
-            this.p5.vertex(p.x, p.y + this.size / 2);
-            this.p5.endShape(this.p5.CLOSE);
+            p5.beginShape();
+            p5.vertex(p.x - this.size / 2, p.y);
+            p5.vertex(p.x, p.y - this.size / 2);
+            p5.vertex(p.x + this.size / 2, p.y);
+            p5.vertex(p.x, p.y + this.size / 2);
+            p5.endShape(p5.CLOSE);
         });
 
         // Extras
 
-        this.p5.noFill();
-        this.p5.noStroke();
+        p5.noFill();
+        p5.noStroke();
     }
 
     drawIsoGrid() {
@@ -184,20 +183,20 @@ export default class IsoGrid {
             p.isMouseHover = this.mouseVect == p;
             const fill = p.isMouseHover ? this.colors.hoverGridFill : p.fillColor;
             const stroke = p.isMouseHover ? this.colors.hoverGridStroke : p.strokeColor;
-            this.p5.stroke(stroke);
-            this.p5.fill(fill);
+            p5.stroke(stroke);
+            p5.fill(fill);
 
-            this.p5.beginShape();
-            this.p5.vertex(p.x - this.size / 2, p.y);
-            this.p5.vertex(p.x, p.y - this.size / 2);
-            this.p5.vertex(p.x + this.size / 2, p.y);
-            this.p5.vertex(p.x, p.y + this.size / 2);
-            this.p5.endShape(this.p5.CLOSE);
+            p5.beginShape();
+            p5.vertex(p.x - this.size / 2, p.y);
+            p5.vertex(p.x, p.y - this.size / 2);
+            p5.vertex(p.x + this.size / 2, p.y);
+            p5.vertex(p.x, p.y + this.size / 2);
+            p5.endShape(p5.CLOSE);
         });
 
         // Extras
 
-        this.p5.noFill();
-        this.p5.noStroke();
+        p5.noFill();
+        p5.noStroke();
     }
 }

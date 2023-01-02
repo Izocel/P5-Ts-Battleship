@@ -1,17 +1,14 @@
-import P5 from "p5";
 import { onlyUnique } from "../Utils/utils";
 import IsoGrid from "./IsoGrid";
 import MyVect from "./MyVect";
 
 export default class GridPaterns {
-    private p5: P5;
     public selected: string;
     public startVect: MyVect;
     public gridIndexes: number[] = [];
     public gridCtx: IsoGrid;
 
-    constructor(p5: P5, gridCtx: IsoGrid, indexes: number[] = []) {
-        this.p5 = p5;
+    constructor(gridCtx: IsoGrid, indexes: number[] = []) {
         this.gridIndexes = indexes;
         this.gridCtx = gridCtx;
     }

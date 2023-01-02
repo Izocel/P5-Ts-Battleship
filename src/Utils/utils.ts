@@ -12,7 +12,7 @@ export function windowResized(canvaWidth: number, canvaHeight: number) {
 
 export function onlyUnique(value, index, self) {
     return self.indexOf(value) === index;
-  }
+}
 
 function convertToClosed(points, radius) {
     // this value *actually* depends on the angle between the lines.

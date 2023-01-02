@@ -1,18 +1,21 @@
 {
-  "name": "p5js-with-typescript",
-  "version": "1.0.0",
-  "description": "A template for a p5.js sketch using Typescript",
+  "name": "Battleships",
+  "description": "A BattleShip prototype",
   "main": "index.html",
+  "version": "1.0.0",
+  "private": true,
   "scripts": {
     "start": "parcel index.html --open",
     "build": "parcel build index.html"
   },
   "dependencies": {
     "@types/p5": "0.9.0",
-    "p5": "0.9.0"
+    "p5": "0.9.0",
+    "parcel-plugin-static-files-copy": "^2.6.0"
   },
   "devDependencies": {
     "@types/jquery": "^3.5.16",
+    "@types/node": "^18.11.18",
     "parcel-bundler": "^1.6.1",
     "sass": "^1.57.1",
     "typescript": "^4.9.4"
@@ -20,5 +23,8 @@
   "keywords": [
     "p5js",
     "typescript"
-  ]
+  ],
+  "staticFiles": {
+    "staticPath": "./Assets"
+ }
 }

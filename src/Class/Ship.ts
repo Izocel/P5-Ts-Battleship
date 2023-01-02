@@ -1,9 +1,10 @@
 import { Vector } from "p5";
-import p5 from "../app";
 import IsoGrid from "./IsoGrid";
 import MyVect from "./MyVect";
 import { drawRoundedPolygon } from "../Utils/utils";
 import { GRIDBOXRADIUS, ORIENTATIONS, SHIPCOLORS } from "../Constants/constants";
+import Sprite from "./Sprite";
+import p5 from "../app";
 
 export default class Ship extends MyVect {
     grid: IsoGrid;
@@ -13,6 +14,7 @@ export default class Ship extends MyVect {
     name: string = "Destroyer";
     colors = { ...SHIPCOLORS[this.name] };
     hidden: boolean = false;
+    sprite: Sprite;
 
     constructor(name: string = "Destroyer", pv: number = 2, grid: IsoGrid) {
         super();
@@ -23,6 +25,11 @@ export default class Ship extends MyVect {
 
         this.updateGridIndex();
         this.grid.ships[this.name] = this;
+    }
+
+    setSprite(sprite: Sprite): Sprite {
+        this.sprite = sprite;
+        return this.sprite;
     }
 
     getGridDelta() {
@@ -143,6 +150,21 @@ export default class Ship extends MyVect {
         return this.orientation;
     }
 
+    getAngle() {
+        switch (this.orientation) {
+            case "dUp":
+                return 45;
+            case "side":
+                return 90;
+            case "dDown":
+                return 135;
+            case "bottom":
+                return 180;
+            default:
+                return 0;
+        }
+    }
+
     //draw colords rects
     draw() {
         this.updateGridIndex();
@@ -189,5 +211,13 @@ export default class Ship extends MyVect {
         this.colors.fill();
         this.colors.stroke();
         drawRoundedPolygon(quad, GRIDBOXRADIUS);
+
+        if (quad.length === 4 && this.sprite) {
+            this.sprite.resize(this.grid.size - (this.grid.getPadding() / 2), this.grid.size * (this.maxHp) - this.grid.size / 2)
+            this.sprite.moveToVect(pEnd)
+            this.sprite.setAngle(this.getAngle());
+            this.sprite.show();
+        }
+
     }
 }
