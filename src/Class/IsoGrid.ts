@@ -48,6 +48,23 @@ export default class IsoGrid {
         return this.padding;
     }
 
+    getAllShipIndexes():number[] {
+        let outputs:number[] = [];
+        Object.entries(this.ships).forEach(s => {
+            const ship: Ship = s[1];
+
+            ship.gridIndex?.forEach(i => {
+                outputs.push(i);
+            });
+        });
+
+        return outputs;
+    }
+
+    shipAtIndex(idx:number) {
+        return this.getAllShipIndexes().includes(idx);
+    }
+
     setupIsoGrid(start: Vector = new Vector()): MyVect[] {
         for (let y = this.size / 2; y < this.height; y += this.size / 2) {
             let x = ((y) % (this.size) == 0) ? this.size : this.size / 2;

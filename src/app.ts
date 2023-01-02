@@ -12,6 +12,8 @@ import MyVect from "./Class/MyVect";
 import GridPaterns from "./Class/GridPaterns";
 import GameConsole from "./Class/GameConsole";
 
+let gameConsole: GameConsole = null;
+
 // Creating the sketch itself
 function sketch(p5: P5) {
 	p5.setup = () => {
@@ -83,18 +85,24 @@ let calcHeight = Math.floor(canvaHeight / (nbColRow * 3));
 const p5 = new P5(sketch);
 
 // Player Init
-let gameConsole:GameConsole = null;
 let selectedAtkMode = "attack";
 
 function onClickAttack(e: object, mouseAtkGrids: number[]) {
-	console.log(e)
+	const hitIdx: number[] = [];
+	gameConsole.log(`Fires at(${mouseAtkGrids})`);
+	
 	mouseAtkGrids.forEach(idx => {
 		const point = attakGrid.points[idx];
-
-		if (point) {
+		
+		if (defenseGrid.shipAtIndex(idx)) {
 			point.pinColor = "green";
+			hitIdx.push(idx);
 		}
 	});
+	
+	if (hitIdx.length)
+		gameConsole.succes(`Successfull hits(${hitIdx})`);
+
 	return attakGrid
 }
 

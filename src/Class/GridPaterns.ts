@@ -1,4 +1,5 @@
 import P5 from "p5";
+import { onlyUnique } from "../Utils/utils";
 import IsoGrid from "./IsoGrid";
 import MyVect from "./MyVect";
 
@@ -20,7 +21,7 @@ export default class GridPaterns {
             return [si];
 
         const indexDelta: number = 1;
-        const gridOutputs: number[] = [];
+        let gridOutputs: number[] = [];
 
         const isEven = n % 2 === 0;
         const leftN = Math.floor(n / 2);
@@ -31,6 +32,8 @@ export default class GridPaterns {
             gridOutputs.push(idx);
         }
 
+        gridOutputs = gridOutputs.filter(onlyUnique);
+        gridOutputs.sort(function (a, b) { return a - b });
         return gridOutputs;
     }
 
@@ -40,7 +43,7 @@ export default class GridPaterns {
         }
 
         const indexDelta: number = this.gridCtx.nbCol;
-        const gridOutputs: number[] = [];
+        let gridOutputs: number[] = [];
 
         const divider = Math.floor(n / 2);
         let start = si - indexDelta * divider;
@@ -55,6 +58,7 @@ export default class GridPaterns {
             gridOutputs.push(idx)
         }
 
+        gridOutputs = gridOutputs.filter(onlyUnique);
         gridOutputs.sort(function (a, b) { return a - b });
         return gridOutputs;
     }
@@ -63,7 +67,7 @@ export default class GridPaterns {
         if (n === 1)
             return [si];
 
-        const gridOutputs: number[] = [];
+        let gridOutputs: number[] = [];
         const stepDelta: number = this.gridCtx.nbCol;
         const lineDelta: number = this.gridCtx.nbCol - 1;
 
@@ -75,6 +79,7 @@ export default class GridPaterns {
             }
         }
 
+        gridOutputs = gridOutputs.filter(onlyUnique);
         gridOutputs.sort(function (a, b) { return a - b });
         return gridOutputs;
     }

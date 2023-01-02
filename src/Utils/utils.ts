@@ -10,6 +10,10 @@ export function windowResized(canvaWidth: number, canvaHeight: number) {
     p5.resizeCanvas(canvaWidth, canvaHeight);
 }
 
+export function onlyUnique(value, index, self) {
+    return self.indexOf(value) === index;
+  }
+
 function convertToClosed(points, radius) {
     // this value *actually* depends on the angle between the lines.
     // a 180 degree angle means f can be 1, a 10 degree angle needs
